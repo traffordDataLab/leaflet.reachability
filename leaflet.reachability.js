@@ -2,7 +2,7 @@
     Created:        2018/06/12 by James Austin - Trafford Data Lab
     Purpose:        Uses openrouteservice API to create isolines showing areas within reach of certain travel times based on different modes of travel or distance. See https://wiki.openstreetmap.org/wiki/Isochrone for more information
     Dependencies:   Leaflet.js (external library), openrouteservice.org API (requires a key - free service available via registration), some AJAX function (either custom or simple_ajax_request.js)
-    Licence:        https://www.trafforddatalab.io/assets/LICENSE.txt
+    Licence:        https://github.com/traffordDataLab/leaflet.reachability/blob/master/LICENSE
     Notes:          Can be displayed in a collapsed or expanded state. Content for all GUI elements can be html or an icon etc.
                     © Powered by openrouteservice https://openrouteservice.org/
 */
