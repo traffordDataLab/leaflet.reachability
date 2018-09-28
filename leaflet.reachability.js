@@ -296,6 +296,9 @@ L.Control.Reachability = L.Control.extend({
 
         // Remove the active class from the control container if either the draw or delete modes are active
         if (L.DomUtil.hasClass(this._container, this.options.activeStyleClass)) L.DomUtil.removeClass(this._container, this.options.activeStyleClass);
+
+        // Fire event to inform that the control has been expanded
+        this._map.fire('reachability:control_expanded');
     },
 
     _collapse: function () {
@@ -307,6 +310,9 @@ L.Control.Reachability = L.Control.extend({
 
         // Add the active class to the control container if either the draw or delete modes are active
         if ((this._drawMode || this._deleteMode) && !L.DomUtil.hasClass(this._container, this.options.activeStyleClass)) L.DomUtil.addClass(this._container, this.options.activeStyleClass);
+
+        // Fire event to inform that the control has been collapsed
+        this._map.fire('reachability:control_collapsed');
     },
 
     // Toggle the draw control between active and inactive states
@@ -366,8 +372,8 @@ L.Control.Reachability = L.Control.extend({
             .on('mousedown', this._updatePointerMarkerPosition, this)
             .on('click', this._registerDrawRequest, this);
 
-        // Fire an event to indicate that the control is active - in case we want to run some external code etc.
-        this._map.fire('reachability:activated');
+        // Fire an event to indicate that the control draw mode has been activated
+        this._map.fire('reachability:draw_activated');
     },
 
     _deactivateDraw: function () {
@@ -389,8 +395,8 @@ L.Control.Reachability = L.Control.extend({
             .off('mousedown', this._updatePointerMarkerPosition, this)
             .off('click', this._registerDrawRequest, this);
 
-        // Fire an event to indicate that the control is no longer active - in case we want to run some external code etc.
-        this._map.fire('reachability:deactivated');
+        // Fire an event to indicate that the control draw mode has been deactivated
+        this._map.fire('reachability:draw_deactivated');
     },
 
     _activateDelete: function () {
@@ -411,6 +417,9 @@ L.Control.Reachability = L.Control.extend({
                 // We have more than one so the user will need to choose which to delete. Therefore set the control in delete mode and wait for the user event
                 this._deleteMode = true;
                 L.DomUtil.addClass(this._deleteControl, this.options.activeStyleClass);   // add the selected class to the delete button
+
+                // Fire event to inform that the control delete mode has been activated
+                this._map.fire('reachability:delete_activated');
             }
         }
         else {
@@ -425,6 +434,9 @@ L.Control.Reachability = L.Control.extend({
 
         // If collapsed == true, remove the active class from the collapsed control
         if (L.DomUtil.hasClass(this._container, this.options.activeStyleClass)) L.DomUtil.removeClass(this._container, this.options.activeStyleClass);
+
+        // Fire event to inform that the control delete mode has been deactivated
+        this._map.fire('reachability:delete_deactivated');
     },
 
     // Removes a particular 'set' or group of isolines (i.e. either a single isoline or an interval group of isolines) from the isolinesGroup object.
