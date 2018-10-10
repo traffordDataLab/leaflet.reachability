@@ -48,7 +48,9 @@ This is the minimum code required and will use all the default settings. If you 
 
 The plugin has many options, e.g. for controlling the appearance of the user-interface, (allowing icons from popular services such as [Fontawesome](https://fontawesome.com/) to be used), styling the reachability polygons and markers as well as incorporating many of the [openrouteservice API options](https://openrouteservice.org/documentation/#/reference/isochrones/isochrones/isochrones-service). Therefore the list of options in the tables below are presented in sections based on their use. The options within each section are listed in alphabetical order except when grouping related options or introducing certain options first makes more sense.
 
-**Main options** 
+**PLEASE NOTE:** *the options below contain entries for accessible travel mode. This feature is currently unavailable from openrouteservice, however it is due to be activated very soon. Once activated this feature will be enabled in the plugin.* 
+
+**Main options**
 
 These are the general setup options for the plugin control e.g. where it appears on the map, whether it is permanently expanded or if it can be toggled between collapsed and expanded states etc.
 
@@ -67,7 +69,7 @@ These are the general setup options for the plugin control e.g. where it appears
 | `position`                   | String  | `"topleft"`                              | Control [position](http://leafletjs.com/reference.html#control-positions) on the map. |
 | `zIndexMouseMarker`          | Number  | `9000`                                   | CSS z-index of an invisible marker which follows and captures mouse/touch events when the control is in draw mode to prevent triggering other map events. Must be greater than any other layer on the map. |
 
-**User interface options** 
+**User interface options**
 
 The options below control the styling of the user interface as well as for choosing which reachability options should be selected by default.
 
@@ -86,6 +88,9 @@ The options below control the styling of the user interface as well as for choos
 | `distanceButtonContent`         | String | `"Dst"`                                     | HTML content of the button to select distance as the reachability measure. You can use an icon from various icon services instead by passing `""` for this value and adding the required classes to the `distanceButtonStyleClass` option. |
 | `distanceButtonStyleClass`      | String | `""`                                        | CSS class(es) to control the styling/content of the distance button. |
 | `distanceButtonTooltip`         | String | `"Reachability based on distance"`          | Tooltip to appear on-hover over the distance button. |
+| `timeButtonContent`             | String | `"Tme"`                                     | HTML content of the button to select time as the reachability measure. You can use an icon from various icon services instead by passing `""` for this value and adding the required classes to the `timeButtonStyleClass` option. |
+| `timeButtonStyleClass`          | String | `""`                                        | CSS class(es) to control the styling/content of the time button. |
+| `timeButtonTooltip`             | String | `"Reachability based on time"`              | Tooltip to appear on-hover over the time button. |
 | `rangeTypeDefault`              | String | `"time"`                                    | Selects whether distance or time is selected by default as the reachability measure. Any value other than `"distance"` passed to the API is assumed to be `"time"`. Corresponds to `range_type` in the API documentation. |
 | `drivingButtonContent`          | String | `"Drv"`                                     | HTML content of the driving travel mode button. You can use an icon from various icon services instead by passing `""` for this value and adding the required classes to the `drivingButtonStyleClass` option. |
 | `drivingButtonStyleClass`       | String | `""`                                        | CSS class(es) to control the styling/content of the driving travel mode button. |
@@ -111,7 +116,7 @@ The options below control the styling of the user interface as well as for choos
 | `rangeControlTimeInterval`      | Number | `5`                                         | Time intervals between the `rangeControlTimeMin` and `rangeControlTimeMax` values, measured in minutes but multipled by 60 to convert to seconds when passed to the API as this is the only unit of time allowed. Corresponds to `interval` in the API documentation. |
 | `rangeIntervalsLabel`           | String | `"intervals"`                               | Text displayed next to the checkbox which controls whether reachability areas should be drawn for all intervals between the minumum and the value chosen by the user or just the chosen value. |
 
-**Reachability polygon options** 
+**Reachability polygon options**
 
 The options below control the styling of the polygons which are created when a call is made to the openrouteservice API, and allow actions to occur when the user interacts with them.
 
@@ -122,7 +127,7 @@ The options below control the styling of the polygons which are created when a c
 | `mouseOverFn` | Function | `null`   | External function called when a mouseover event occurs on a reachability polygon. |
 | `styleFn`     | Function | `null`   | External function to style the reachability polygon(s) returned from the API. |
 
-**Reachability origin marker options** 
+**Reachability origin marker options**
 
 The following options control whether markers are created at the origin of the reachability polygons (i.e. the point chosen by the user on the map), and if so, what they look like and how they should respond to user interaction.
 
@@ -134,7 +139,7 @@ The following options control whether markers are created at the origin of the r
 | `markerOutFn`     | Function | `null`   | External function called when a mouseout event occurs on a origin marker. |
 | `markerOverFn`    | Function | `null`   | External function called when a mouseover event occurs on a origin marker. |
 
-**Openrouteservice API options** 
+**Openrouteservice API options**
 
 Options presented below are for controlling the communication between the plugin and the openrouteservice API. Some correspond to the options found in the [API documentation](https://openrouteservice.org/documentation/#/reference/isochrones/isochrones/isochrones-service).
 
@@ -147,17 +152,17 @@ Options presented below are for controlling the communication between the plugin
 | `travelModeDrivingProfile`       | String           | `"driving-car"`     | Driving travel profile. Used when the driving mode of travel button is selected. Possible values are `"driving-car"` and `"driving-hgv"`. Corresponds to `profile` in the API documentation. |
 | `travelModeWalkingProfile`       | String           | `"foot-walking"`    | Walking travel profile. Used when the walking mode of travel button is selected. Possible values are `"foot-walking"` and `"foot-hiking"`. Corresponds to `profile` in the API documentation. |
 
-### Events 
+### Events
 
 The following tables list all the events which are fired by the plugin which you can use to perform additional actions within your application.
 
-**information to follow...** 
+**information to follow...**
 
-### Examples 
+### Examples
 
 The following code examples demonstrate the types of customisation possible using the options and events in the tables above. The plugin has been designed to follow the same coding style and methodology as shown in the [Leaflet tutorials](https://leafletjs.com/examples.html) and so should provide a familiar method of integrating and interacting with the plugin in your applications.
 
-**information to follow...** 
+**information to follow...**
 
-## Licence 
+## Licence
 This software is provided under the terms of the [MIT License](https://github.com/traffordDataLab/leaflet.reachability/blob/master/LICENSE).
