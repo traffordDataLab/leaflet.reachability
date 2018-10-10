@@ -48,7 +48,7 @@ This is the minimum code required and will use all the default settings. If you 
 
 The plugin has many options, e.g. for controlling the appearance of the user-interface, (allowing icons from popular services such as [Fontawesome](https://fontawesome.com/) to be used), styling the reachability polygons and markers as well as incorporating many of the [openrouteservice API options](https://openrouteservice.org/documentation/#/reference/isochrones/isochrones/isochrones-service). Therefore the list of options in the tables below are presented in sections based on their use. The options within each section are listed in alphabetical order except when grouping related options or introducing certain options first makes more sense.
 
-**PLEASE NOTE:** *the options below contain entries for accessible travel mode. This feature is currently unavailable from openrouteservice, however it is due to be activated very soon. Once activated this feature will be enabled in the plugin.* 
+**PLEASE NOTE:** *the options below contain entries for accessible travel mode. This feature is currently unavailable from openrouteservice, however it is due to be activated very soon. Once activated this feature will be enabled in the plugin.*
 
 **Main options**
 
@@ -154,9 +154,24 @@ Options presented below are for controlling the communication between the plugin
 
 ### Events
 
-The following tables list all the events which are fired by the plugin which you can use to perform additional actions within your application.
+The following table list all the events fired by the plugin via the map object. You can listen for these events within your application to perform additional actions etc. Instances of `"reachability:no_data"` and `"reachability:error"` being fired will result in further details being recorded in the console log where possible.
 
-**information to follow...**
+| Event                               | Data                                               | Description |
+| ----------------------------------- | ---------------------------------------------------| ----------- |
+| `"reachability:control_added"`      | [Event](http://leafletjs.com/reference.html#event) | Fired when the control is added to the map. |
+| `"reachability:control_removed"`    | [Event](http://leafletjs.com/reference.html#event) | Fired when the control is removed from the map. |
+| `"reachability:control_expanded"`   | [Event](http://leafletjs.com/reference.html#event) | Fired when the control is expanded from its collapsed state. |
+| `"reachability:control_collapsed"`  | [Event](http://leafletjs.com/reference.html#event) | Fired when the control is collapsed from its expanded state. |
+| `"reachability:draw_activated"`     | [Event](http://leafletjs.com/reference.html#event) | Fired when the draw button is activated. |
+| `"reachability:draw_deactivated"`   | [Event](http://leafletjs.com/reference.html#event) | Fired when the draw button is deactivated. |
+| `"reachability:delete_activated"`   | [Event](http://leafletjs.com/reference.html#event) | Fired when the delete button is activated. Delete can only be activated if there is more than one reachability area currently on the map. If there is only one then it will be automatically deleted and the `"reachability:delete"` event will fired instead. If no reachability areas are on the map the button will highlight an error to the user. |
+| `"reachability:delete_deactivated"` | [Event](http://leafletjs.com/reference.html#event) | Fired when the delete button is deactivated. |
+| `"reachability:delete"`             | [Event](http://leafletjs.com/reference.html#event) | Fired when a reachability area is deleted from the map. |
+| `"reachability:api_call_start"`     | [Event](http://leafletjs.com/reference.html#event) | Fired when a call to the openrouteservice API is started.  |
+| `"reachability:api_call_end"`       | [Event](http://leafletjs.com/reference.html#event) | Fired when a call to the openrouteservice API is ended. |
+| `"reachability:displayed"`          | [Event](http://leafletjs.com/reference.html#event) | Fired when reachability polygon(s) are displayed on the map following an openrouteservice API call. |
+| `"reachability:no_data"`            | [Event](http://leafletjs.com/reference.html#event) | Fired when the openrouteservice API returns no reachability areas following a call. |
+| `"reachability:error"`              | [Event](http://leafletjs.com/reference.html#event) | Fired when a call to the openrouteservice API cannot be made for some reason. |
 
 ### Examples
 
