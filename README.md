@@ -36,7 +36,7 @@ After including the CSS and JS in your page:...
         // Initialise the reachability plugin
         L.control.reachability({
             // add settings/options here
-            apiKey: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+            apiKey: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
         }).addTo(map);
     </script>
 </body>
@@ -46,7 +46,7 @@ This is the minimum code required and will use all the default settings. If you 
 
 ### Options
 
-The plugin has many options, e.g. for controlling the appearance of the user-interface, (allowing icons from popular services such as [Fontawesome](https://fontawesome.com/) to be used), styling the reachability polygons and markers as well as incorporating many of the [openrouteservice API options](https://openrouteservice.org/documentation/#/reference/isochrones/isochrones/isochrones-service). Therefore the list of options in the tables below are presented in sections based on their use. The options within each section are listed in alphabetical order except when grouping related options or introducing certain options first makes more sense.
+The plugin has many options, e.g. for controlling the appearance of the user-interface, (allowing icons from popular services such as [Font Awesome](https://fontawesome.com/) to be used), styling the reachability polygons and markers as well as incorporating many of the [openrouteservice API options](https://openrouteservice.org/documentation/#/reference/isochrones/isochrones/isochrones-service). Therefore the list of options in the tables below are presented in sections based on their use. The options within each section are listed in alphabetical order except when grouping related options or introducing certain options first makes more sense.
 
 **PLEASE NOTE:** *the options below contain entries for accessible travel mode. This feature is currently unavailable from openrouteservice, however it is due to be activated very soon. Once activated this feature will be enabled in the plugin.*
 
@@ -177,7 +177,26 @@ The following table lists all the events fired by the plugin via the map object.
 
 The following code examples demonstrate the types of customisation possible using the options and events in the tables above. The plugin has been designed to follow the same coding style and methodology as shown in the [Leaflet tutorials](https://leafletjs.com/examples.html) and so should provide a familiar method of integrating and interacting with the plugin in your applications.
 
-**information to follow...**
+**Example 1: Changing the HTML content of the expand button to an icon**
+
+This example is applicable to all the buttons associated with the plugin. For this example we will be using [Font Awesome 4.7.0 icons](https://fontawesome.com/v4.7.0/icons/) but you can apply the same principle to other versions or icon libraries.
+
+First include the icon library file:
+
+```HTML
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"/>
+```
+
+Then specify the options within the code to initialise the plugin. Here we are using `expandButtonContent` and `expandButtonStyleClass` to show a map marker icon instead of the default &#x2609; character:
+
+```javascript
+L.control.reachability({
+    // add settings/options here
+    apiKey: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+    expandButtonContent: '',
+    expandButtonStyleClass: 'reachability-control-expand-button fa fa-map-marker'
+}).addTo(map);
+```
 
 ## Licence
 This software is provided under the terms of the [MIT License](https://github.com/traffordDataLab/leaflet.reachability/blob/master/LICENSE).
