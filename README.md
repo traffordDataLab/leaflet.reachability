@@ -48,7 +48,7 @@ This is the minimum code required and will use all the default settings. If you 
 
 The plugin has many options, e.g. for controlling the appearance of the user-interface, (allowing icons from popular services such as [Fontawesome](https://fontawesome.com/) to be used), styling the reachability polygons and markers as well as incorporating many of the [openrouteservice API options](https://openrouteservice.org/documentation/#/reference/isochrones/isochrones/isochrones-service). Therefore the list of options in the tables below are presented in sections based on their use. The options within each section are listed in alphabetical order except when grouping related options or introducing certain options first makes more sense.
 
-** Main options **
+**Main options**
 
 These are the general setup options for the plugin control e.g. where it appears on the map, whether it is permanently expanded or if it can be toggled between collapsed and expanded states etc.
 
@@ -68,7 +68,7 @@ These are the general setup options for the plugin control e.g. where it appears
 | `zIndexMouseMarker`          | Number  | `9000`                                   | CSS z-index of an invisible marker which follows and captures mouse/touch events when the control is in draw mode to prevent triggering other map events. Must be greater than any other layer on the map. |
 
 <br />
-** User interface options **
+**User interface options**
 
 The options below control the styling of the user interface as well as for choosing which reachability options should be selected by default.
 
@@ -113,7 +113,7 @@ The options below control the styling of the user interface as well as for choos
 | `rangeIntervalsLabel`           | String | `"intervals"`                               | Text displayed next to the checkbox which controls whether reachability areas should be drawn for all intervals between the minumum and the value chosen by the user or just the chosen value. |
 
 <br />
-** Reachability polygon options **
+**Reachability polygon options**
 
 The options below control the styling of the polygons which are created when a call is made to the openrouteservice API, and allow actions to occur when the user interacts with them.
 
@@ -138,7 +138,7 @@ The following options control whether markers are created at the origin of the r
 | `markerOverFn`    | Function | `null`   | External function called when a mouseover event occurs on a origin marker. |
 
 <br />
-** Openrouteservice API options **
+**Openrouteservice API options**
 
 Options presented below are for controlling the communication between the plugin and the openrouteservice API. Some correspond to the options found in the [API documentation](https://openrouteservice.org/documentation/#/reference/isochrones/isochrones/isochrones-service).
 
@@ -156,14 +156,14 @@ Options presented below are for controlling the communication between the plugin
 
 The following tables list all the events which are fired by the plugin which you can use to perform additional actions within your application.
 
-** information to follow... **
+**information to follow...**
 
 <br />
 ### Examples
 
 The following code examples demonstrate the types of customisation possible using the options and events in the tables above. The plugin has been designed to follow the same coding style and methodology as shown in the [Leaflet tutorials](https://leafletjs.com/examples.html) and so should provide a familiar method of integrating and interacting with the plugin in your applications.
 
-** information to follow... **
+**information to follow...**
 
 <br />
 ## Licence
