@@ -154,7 +154,7 @@ Options presented below are for controlling the communication between the plugin
 
 ### Events
 
-The following table list all the events fired by the plugin via the map object. You can listen for these events within your application to perform additional actions etc. Instances of `"reachability:no_data"` and `"reachability:error"` being fired will result in further details being recorded in the console log where possible.
+The following table lists all the events fired by the plugin via the map object. You can listen for these events within your application to perform additional actions etc. Instances of `"reachability:no_data"` and `"reachability:error"` being fired will result in further details being recorded in the console log where possible.
 
 | Event                               | Data                                               | Description |
 | ----------------------------------- | ---------------------------------------------------| ----------- |
