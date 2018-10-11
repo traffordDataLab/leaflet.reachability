@@ -629,56 +629,21 @@ L.Control.Reachability = L.Control.extend({
                     /*
                         NOTE: The GeoJSON features returned from the API are in the order smallest to largest in terms of the area of the polygons.
                         This causes us a problem as when they are displayed on the map, the largest polygon covers all the others, preventing us interacting with the other polygons.
-                        The solution is to reverse the order of the features, however this is not as simple as sorting due to how Leaflet deals with layers.
-                        Each layer is given an id. When you add layers to layergroup objects, it doesn't matter the order you add them, what matters is the id sequence.
-                        Therefore we need to generate new a new id for each layer, with the larger polygon layers given lower ids than the smaller.
+                        The solution is to reverse the order of the features in the GeoJSON before we create the Leaflet L.geoJSON object.
                     */
+                    if (data.hasOwnProperty('features')) {
+                        data.features.reverse();    // reverse the order of the features array
 
-                    // Create a Leaflet GeoJSON FeatureGroup object from the GeoJSON returned from the API - This is intended to be accessible externally if required
-                    context.latestIsolines = L.geoJSON(data, { style: context.options.styleFn, pane: context.options.pane });
+                        /*
+                            Reformat the data in the properties object to be more readable and informative
 
-                    // Load the layers from the GeoJSON object into an array so that we can sort them in decending id order if there are more than 1
-                    var arrLayers = context.latestIsolines.getLayers();
+                            Returned values from API:
+                                value:      either metres or seconds depending on distance or time. Ignores the input in km or mi!
+                                total_pop:  integer value of people living in the area as given by Global Human Settlement (GHS) framework
+                        */
+                        for (var i = 0; i < data.features.length; i++) {
 
-                    if (arrLayers.length > 0) {
-                        // Now remove all the layers from the GeoJSON object - we will be adding them back once we've reorded them
-                        context.latestIsolines.clearLayers();
-
-                        // Sort the array in decending order of the internal Leaflet id
-                        arrLayers.sort(function (a, b) { return b['_leaflet_id'] - a['_leaflet_id'] });
-
-                        for (var i = 0; i < arrLayers.length; i++) {
-                            // Wipe the internal Leaflet layer id and...
-                            arrLayers[i]['_leaflet_id'] = null;
-
-                            // ...force Leaflet to assign a new one
-                            L.Util.stamp(arrLayers[i]);
-
-                            // Add events to the layer - do here whilst we're looping through the array rather than after using the Leaflet eachLayer() method
-                            arrLayers[i].on({
-                                mouseover: (function (e) { if (context.options.mouseOverFn != null) context.options.mouseOverFn(e) }),
-                                mouseout: (function (e) { if (context.options.mouseOutFn != null) context.options.mouseOutFn(e) }),
-                                click: (function(e) {
-                                    if (context._deleteMode) {
-                                        // If we're in delete mode, call the delete function
-                                        L.DomEvent.stopPropagation(e);
-                                        context._delete(e);
-                                    }
-                                    else {
-                                        // Otherwise, if there is a user-defined click function, call that instead
-                                        if (context.options.clickFn != null) context.options.clickFn(e);
-                                    }
-                                })
-                            });
-
-                            /*
-                                Reformat the data in the properties object to be more readable and informative
-
-                                Returned values from API:
-                                    value:  either metres or seconds depending on distance or time. Ignores the input in km or mi!
-                                    total_pop:  integer value of people living in the area as given by Global Human Settlement (GHS) framework
-                            */
-                            var props = arrLayers[i].feature.properties;    // get the current properties for the layer
+                            var props = data.features[i].properties;    // get the properties for the current feature
                             var range,
                                 rangeType,
                                 rangeUnits,
@@ -728,11 +693,30 @@ L.Control.Reachability = L.Control.extend({
                             }
 
                             // Replace the old properties object with the new one
-                            arrLayers[i].feature.properties = newProps;
-
-                            // Now add the layer with its new id to the Leaflet GeoJSON object
-                            context.latestIsolines.addLayer(arrLayers[i]);
+                            data.features[i].properties = newProps;
                         }
+
+                        // Create a Leaflet GeoJSON FeatureGroup object from the GeoJSON returned from the API - This is intended to be accessible externally if required
+                        context.latestIsolines = L.geoJSON(data, { style: context.options.styleFn, pane: context.options.pane });
+
+                        context.latestIsolines.eachLayer(function (layer) {
+                            // Iterate through each layer adding events if applicable
+                            layer.on({
+                                mouseover: (function (e) { if (context.options.mouseOverFn != null) context.options.mouseOverFn(e) }),
+                                mouseout: (function (e) { if (context.options.mouseOutFn != null) context.options.mouseOutFn(e) }),
+                                click: (function(e) {
+                                    if (context._deleteMode) {
+                                        // If we're in delete mode, call the delete function
+                                        L.DomEvent.stopPropagation(e);
+                                        context._delete(e);
+                                    }
+                                    else {
+                                        // Otherwise, if there is a user-defined click function, call that instead
+                                        if (context.options.clickFn != null) context.options.clickFn(e);
+                                    }
+                                })
+                            });
+                        });
 
                         // Create a marker at the latlng if desired. Can be used to indicate the mode of travel etc.
                         if (context.options.showOriginMarker) {
@@ -779,6 +763,8 @@ L.Control.Reachability = L.Control.extend({
                         context._map.fire('reachability:displayed');
                     }
                     else {
+                        context.latestIsolines = null;
+
                         // Fire event to inform that no data was returned
                         context._map.fire('reachability:no_data');
 
