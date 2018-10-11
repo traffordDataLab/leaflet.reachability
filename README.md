@@ -236,13 +236,13 @@ The table below describes the contents of the polygon properties object:
 | Key             | Type   | Description |
 |-----------------|--------|-------------|
 | `"Area"`        | Number | Approximate area covered by the polygon, measured in `"Area units"`. |
-| `"Area units"`  | String | Units for the `"Area"` value. If the `"Measure"` is `"time"` this will be **km^2** otherwise it will be set to the square of the units of the plugin option `rangeControlDistanceUnits`. |
+| `"Area units"`  | String | Units for the `"Area"` value. This will be set to the square of the units of the plugin option `rangeControlDistanceUnits`, e.g. `"m^2"`, `"km^2"` or `"mi^2"`. |
 | `"Latitude"`    | Number | Latitude of the point of origin for the reachability polygon. |
 | `"Longitude"`   | Number | Longitude of the point of origin for the reachability polygon. |
 | `"Measure"`     | String | Either `"time"` or `"distance"`. |
 | `"Population"`  | Number | Estimate of the number of people living in the area covered by the polygon. This value is supplied in the openrouteservice API via [Global Human Settlement (GHS)](https://ghsl.jrc.ec.europa.eu/about.php) data. |
 | `"Range"`       | Number | Range value of the reachability polygon measured in `"Range units"`. |
-| `"Range units"` | String | If `"Measure"` is `"time"` this value will be `"min"` (minutes), otherwise it will be set to the units of the plugin option `rangeControlDistanceUnits`. |
+| `"Range units"` | String | If `"Measure"` is `"time"` this value will be `"min"` (minutes), otherwise it will be set to the units of the plugin option `rangeControlDistanceUnits`, e.g. `"m"`, `"km"` or `"mi"`. |
 | `"Travel mode"` | String | The openrouteservice API mode of travel `profile` of the polygon. |
 
 These properties can be bound to a popup or displayed within a custom container when the user selects a reachability area etc.
