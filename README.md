@@ -249,7 +249,7 @@ These properties can be bound to a popup or displayed within a custom container 
 
 ### Examples
 
-The following code examples demonstrate the types of customisation possible using the options and events in the tables above. The plugin has been designed to follow the same coding style and methodology as shown in the [Leaflet tutorials](https://leafletjs.com/examples.html) and so should provide a familiar method of integrating and interacting with the plugin in your applications.
+The following code examples, in addition to the [demo page](https://rawgit.com/trafforddatalab/leaflet.reachability/master/leaflet.reachability_example.html), demonstrate the types of customisation possible using the options and events in the tables above. The plugin has been designed to follow the same coding style and methodology as shown in the [Leaflet tutorials](https://leafletjs.com/examples.html) and so should provide a familiar method of integrating and interacting with the plugin in your applications.
 
 **Example 1: Changing the HTML content of the expand button to an icon**
 
@@ -291,6 +291,48 @@ L.control.reachability({
     styleFn: styleIsolines
 }).addTo(map);
 ```
+
+Notice the `feature` parameter in the `styleIsolines` function. This can be used to conditionally style the reachability polygons based on their property values. The following example demonstrates how to style each polygon based on its range. **NOTE: the example assumes the default range values for distance and time**
+
+```javascript
+function getColourByRange(value) {
+    switch (value) {
+        case 5:
+            return '#ff0000';
+        case 10:
+            return '#00ff00';
+        case 15:
+            return '#0000ff';
+        case 20:
+            return '#ffff00';
+        case 25:
+            return '#ff00ff';
+        default:
+            return '#00ffff'
+    }
+}
+
+function styleIsolines(feature) {
+    // Get the value of the range property of the feature
+    var rangeVal = feature.properties['Range'];
+    // If the range is based on distance, multiply the value by 10 to match the time range values
+    if (feature.properties['Measure'] == 'distance') rangeVal = rangeVal * 10;
+
+    return {
+        color: getColourByRange(rangeVal),
+        opacity: 0.5,
+        fillOpacity: 0.2
+    };
+}
+
+L.control.reachability({
+    // add settings/options here
+    apiKey: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+    styleFn: styleIsolines
+}).addTo(map);
+```
+
+This is similar to the method introduced in the [Leaflet Interactive Choropleth Map](https://leafletjs.com/examples/choropleth/) tutorial.
 
 ## Licence
 This software is provided under the terms of the [MIT License](https://github.com/traffordDataLab/leaflet.reachability/blob/master/LICENSE).
