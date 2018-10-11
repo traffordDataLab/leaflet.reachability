@@ -272,5 +272,25 @@ L.control.reachability({
 }).addTo(map);
 ```
 
+**Example 2: Styling the reachability polygons**
+
+The easiest way to style the reachability polygons is by creating a function and passing it via the `styleFn` option. This is demonstrated in the example below which colours all the polygons red with transparency:
+
+```javascript
+function styleIsolines(feature) {
+    return {
+        color: '#ff0000',
+        opacity: 0.5,
+        fillOpacity: 0.2
+    };
+}
+
+L.control.reachability({
+    // add settings/options here
+    apiKey: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+    styleFn: styleIsolines
+}).addTo(map);
+```
+
 ## Licence
 This software is provided under the terms of the [MIT License](https://github.com/traffordDataLab/leaflet.reachability/blob/master/LICENSE).
