@@ -105,12 +105,12 @@ The options below control the styling of the user interface as well as for choos
 | `accessibilityButtonStyleClass` | String | `""`                                        | CSS class(es) to control the styling/content of the accessibility travel mode button. |
 | `accessibilityButtonTooltip`    | String | `"Travel mode: wheelchair"`                 | Tooltip to appear on-hover over the accessibility travel mode button. |
 | `travelModeDefault`             | String | `null`                                      | Sets the default travel profile. If this is not equal to one of the travel profile options (see openrouteservice API options below) it will use the value of `travelModeDrivingProfile` |
-| `rangeControlDistanceTitle`     | String | `"Dist."`                                   | Title displayed above the range drop-down list when distance is selected as the reachability measure. |
+| `rangeControlDistanceTitle`     | String | `"Dist."`                                   | Title displayed above the range select list when distance is selected as the reachability measure. |
 | `rangeControlDistanceUnits`     | String | `"km"`                                      | Units for the distance measure. Can be `"m"` (metres), `"km"` (kilometres) or `"mi"` (miles). Corresponds to `units` in the API documentation. |
 | `rangeControlDistanceMin`       | Number | `0.5`                                       | Minimum distance value to calculate reachability, measured in `rangeControlDistanceUnits`. |
 | `rangeControlDistanceMax`       | Number | `3`                                         | Maximum distance value to calculate reachability, measured in `rangeControlDistanceUnits`. |
 | `rangeControlDistanceInterval`  | Number | `0.5`                                       | Distance intervals between the `rangeControlDistanceMin` and `rangeControlDistanceMax` values, measured in `rangeControlDistanceUnits`. Corresponds to `interval` in the API documentation. |
-| `rangeControlTimeTitle`         | String | `"Time"`                                    | Title displayed above the range drop-down list when time is selected as the reachability measure. |
+| `rangeControlTimeTitle`         | String | `"Time"`                                    | Title displayed above the range select list when time is selected as the reachability measure. |
 | `rangeControlTimeMin`           | Number | `5`                                         | Minimum time value to calculate reachability, measured in minutes but multipled by 60 to convert to seconds when passed to the API as this is the only unit of time allowed. |
 | `rangeControlTimeMax`           | Number | `30`                                        | Maximum time value to calculate reachability, measured in minutes but multipled by 60 to convert to seconds when passed to the API as this is the only unit of time allowed. |
 | `rangeControlTimeInterval`      | Number | `5`                                         | Time intervals between the `rangeControlTimeMin` and `rangeControlTimeMax` values, measured in minutes but multipled by 60 to convert to seconds when passed to the API as this is the only unit of time allowed. Corresponds to `interval` in the API documentation. |
@@ -172,6 +172,80 @@ The following table lists all the events fired by the plugin via the map object.
 | `"reachability:displayed"`          | [Event](http://leafletjs.com/reference.html#event) | Fired when reachability polygon(s) are displayed on the map following an openrouteservice API call. |
 | `"reachability:no_data"`            | [Event](http://leafletjs.com/reference.html#event) | Fired when the openrouteservice API returns no reachability areas following a call. |
 | `"reachability:error"`              | [Event](http://leafletjs.com/reference.html#event) | Fired when a call to the openrouteservice API cannot be made for some reason. |
+
+### API/plugin output
+
+Upon completion of a successful call to the openrouteservice API, two objects belonging to the plugin instance will contain data, `isolinesGroup` and `latestIsolines`. If the plugin was initialised like this...
+
+```JavaScript
+var reachabilityControl = L.control.reachability({
+    // add settings/options here
+    apiKey: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+}).addTo(map);
+```
+
+...the objects can be read like this...
+
+```JavaScript
+reachabilityControl.isolinesGroup;
+reachabilityControl.latestIsolines;
+```
+
+Both objects are types of the Leaflet [L.geoJSON layer](http://leafletjs.com/reference.html#geojson) object. The object `isolinesGroup` contains all the sets of reachability area polygons (and origin markers if `showOriginMarker` is `true`) that are currently drawn on the map. As the name suggests, `latestIsolines` contains the latest reachability areas returned from the most recent call to the API. If the user chooses to show the intervals between the minimum time or distance up to the value they have selected in the range select list, `latestIsolines` will contain a group of polygons, whereas if the intervals box is not checked it will only contain a single polygon. Important to also bear in mind, unless the `showOriginMarker` option is set to `false`, the `latestIsolines` group will also contain an additional feature for the origin marker.
+
+Within the `properties` object of each reachability polygon are various key/value pairs of data about the polygon, as shown in the example output below for a single reachability area created with an origin marker:
+
+```JavaScript
+{
+    "type":"FeatureCollection",
+    "features":[
+        {
+            "type":"Feature",
+            "geometry":{
+                "type":"Polygon",
+                "coordinates":[
+                    [[-2.370967,53.431257],[-2.36845,53.430113],[-2.36371,53.422503],[-2.364027,53.41888],[-2.363917,53.416437],[-2.364106,53.409888],[-2.364085,53.409858],[-2.355248,53.405067],[-2.351026,53.401611],[-2.350658,53.401514],[-2.349777,53.401307],[-2.342775,53.401318],[-2.339174,53.401537],[-2.327938,53.404358],[-2.321353,53.404366],[-2.31331,53.401548],[-2.306582,53.406475],[-2.300036,53.416301],[-2.298577,53.420985],[-2.297909,53.423529],[-2.298552,53.42516],[-2.299297,53.426989],[-2.300775,53.429392],[-2.300912,53.429455],[-2.308067,53.434208],[-2.311778,53.438383],[-2.313744,53.440942],[-2.313902,53.440948],[-2.315041,53.440358],[-2.324808,53.436981],[-2.334137,53.434914],[-2.344139,53.438308],[-2.346769,53.438204],[-2.349127,53.437997],[-2.349301,53.43793],[-2.355581,53.435077],[-2.367244,53.433695],[-2.369887,53.434701],[-2.370145,53.434762],[-2.370967,53.431257]]
+                ]
+            },
+            "properties":{
+                "Travel mode":"cycling-regular",
+                "Measure":"time",
+                "Range units":"min",
+                "Range":10,
+                "Area":15.41,
+                "Area units":"km^2",
+                "Latitude":53.423855,
+                "Longitude":-2.332535,
+                "Population":62534
+            }
+        },
+        {
+            "type":"Feature",
+            "geometry":{
+                "type":"Point",
+                "coordinates":[-2.332535,53.423855]
+            },
+            "properties":{}
+        }
+    ]
+}
+```
+
+The table below describes the contents of the polygon properties object:
+
+| Key             | Type   | Description |
+|-----------------|--------|-------------|
+| `"Area"`        | Number | Approximate area covered by the polygon, measured in `"Area units"`. |
+| `"Area units"`  | String | Units for the `"Area"` value. If the `"Measure"` is `"time"` this will be **km^2** otherwise it will be set to the square of the units of the plugin option `rangeControlDistanceUnits`. |
+| `"Latitude"`    | Number | Latitude of the point of origin for the reachability polygon. |
+| `"Longitude"`   | Number | Longitude of the point of origin for the reachability polygon. |
+| `"Measure"`     | String | Either `"time"` or `"distance"`. |
+| `"Population"`  | Number | Estimate of the number of people living in the area covered by the polygon. This value is supplied in the openrouteservice API via [Global Human Settlement (GHS)](https://ghsl.jrc.ec.europa.eu/about.php) data. |
+| `"Range"`       | Number | Range value of the reachability polygon measured in `"Range units"`. |
+| `"Range units"` | String | If `"Measure"` is `"time"` this value will be `"min"` (minutes), otherwise it will be set to the units of the plugin option `rangeControlDistanceUnits`. |
+| `"Travel mode"` | String | The openrouteservice API mode of travel `profile` of the polygon. |
+
+These properties can be bound to a popup or displayed within a custom container when the user selects a reachability area etc.
 
 ### Examples
 
