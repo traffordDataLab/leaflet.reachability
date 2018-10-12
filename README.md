@@ -71,7 +71,7 @@ These are the general setup options for the plugin control e.g. where it appears
 
 **User interface options**
 
-The options below control the styling of the user interface as well as for choosing which reachability options should be selected by default.
+The options below control the styling and content of the user interface as well as for choosing which reachability options should be selected by default.
 
 | Option                          | Type   | Default                                     | Description |
 | ------------------------------- | ------ | ------------------------------------------- | ----------- |
@@ -118,7 +118,7 @@ The options below control the styling of the user interface as well as for choos
 
 **Reachability polygon options**
 
-The options below control the styling of the polygons which are created when a call is made to the openrouteservice API, and allow actions to occur when the user interacts with them.
+The options below give you control over the styling and interactive behaviour of the reachability polygons which are created when a call is made to the openrouteservice API.
 
 | Option        | Type     | Default  | Description |
 | ------------- | -------- | -------- | ----------- |
@@ -129,7 +129,7 @@ The options below control the styling of the polygons which are created when a c
 
 **Reachability origin marker options**
 
-The following options control whether markers are created at the origin of the reachability polygons (i.e. the point chosen by the user on the map), and if so, what they look like and how they should respond to user interaction.
+The following options allow you to decide if markers are created at the origin of the reachability polygons (i.e. the point chosen by the user on the map), and if so, give you control over their styling and interactive behaviour.
 
 | Option            | Type     | Default  | Description |
 | ----------------- | -------- | -------- | ----------- |
@@ -139,7 +139,7 @@ The following options control whether markers are created at the origin of the r
 | `markerOutFn`     | Function | `null`   | External function called when a mouseout event occurs on a origin marker. |
 | `markerOverFn`    | Function | `null`   | External function called when a mouseover event occurs on a origin marker. |
 
-**Openrouteservice API options**
+**Openrouteservice API interaction options**
 
 Options presented below are for controlling the communication between the plugin and the openrouteservice API. Some correspond to the options found in the [API documentation](https://openrouteservice.org/documentation/#/reference/isochrones/isochrones/isochrones-service).
 
