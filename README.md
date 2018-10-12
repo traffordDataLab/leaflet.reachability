@@ -264,6 +264,10 @@ First include the icon library file:
 Then specify the options within the code to initialise the plugin. Here we are using `expandButtonContent` and `expandButtonStyleClass` to show a map marker icon instead of the default &#x2609; character:
 
 ```javascript
+// Create the Leaflet map object
+var map = L.map('map', { center: [53.4189, -2.33] });
+
+// Initialise the reachability plugin
 L.control.reachability({
     // add settings/options here
     apiKey: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
@@ -277,6 +281,10 @@ L.control.reachability({
 The easiest way to style the reachability polygons is by creating a function and passing it via the `styleFn` option. This is demonstrated in the example below which colours all the polygons red with transparency:
 
 ```javascript
+// Create the Leaflet map object
+var map = L.map('map', { center: [53.4189, -2.33] });
+
+// Function to style the reachability polygons
 function styleIsolines(feature) {
     return {
         color: '#ff0000',
@@ -285,6 +293,7 @@ function styleIsolines(feature) {
     };
 }
 
+// Initialise the reachability plugin
 L.control.reachability({
     // add settings/options here
     apiKey: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
@@ -292,9 +301,13 @@ L.control.reachability({
 }).addTo(map);
 ```
 
-Notice the `feature` parameter in the `styleIsolines` function. This can be used to conditionally style the reachability polygons based on their property values. The following example demonstrates how to style each polygon based on its range. **NOTE: the example assumes the default range values for distance and time**
+Notice the `feature` parameter in the `styleIsolines` function. This can be used to conditionally style the reachability polygons based on their property values. The following example demonstrates how to style each polygon based on its range. **NOTE: the example assumes the default range values for distance and time:**
 
 ```javascript
+// Create the Leaflet map object
+var map = L.map('map', { center: [53.4189, -2.33] });
+
+// Function to return a colour based on the 'Range' value of the reachability polygons
 function getColourByRange(value) {
     switch (value) {
         case 5:
@@ -312,6 +325,7 @@ function getColourByRange(value) {
     }
 }
 
+// Function to style the reachability polygons
 function styleIsolines(feature) {
     // Get the value of the range property of the feature
     var rangeVal = feature.properties['Range'];
@@ -325,6 +339,7 @@ function styleIsolines(feature) {
     };
 }
 
+// Initialise the reachability plugin
 L.control.reachability({
     // add settings/options here
     apiKey: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
@@ -333,6 +348,38 @@ L.control.reachability({
 ```
 
 This is similar to the method introduced in the [Leaflet Interactive Choropleth Map](https://leafletjs.com/examples/choropleth/) tutorial.
+
+**Example 3: Responding to events**
+
+The following example demonstrates responding to the `reachability:displayed` event to create popups containing information about the reachability areas created:
+
+```javascript
+// Create the Leaflet map object
+var map = L.map('map', { center: [53.4189, -2.33] });
+
+// Listen for the event fired when reachability areas are created on the map
+map.on('reachability:displayed', function (e) {
+    var properties,
+        content;
+
+    // Iterate through the reachability polygons just created, binding a popup to each one
+    reachabilityControl.latestIsolines.eachLayer(function (layer) {
+        // Ensure we only bind popups to the polygons and not the origin marker.
+        // Marker layers don't have the 'feature' property
+        if (layer.hasOwnProperty('feature')) {
+            properties = layer.feature.properties;
+            content = 'Reachability 0 - ' + properties['Range'] + ' ' + properties['Range units'] + '<br />based on ' + properties['Travel mode'] + ' profile';
+            layer.bindPopup(content);
+        }
+    });
+});
+
+// Initialise the reachability plugin
+L.control.reachability({
+    // add settings/options here
+    apiKey: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+}).addTo(map);
+```
 
 ## Licence
 This software is provided under the terms of the [MIT License](https://github.com/traffordDataLab/leaflet.reachability/blob/master/LICENSE).
