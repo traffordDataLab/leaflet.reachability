@@ -25,6 +25,12 @@
                 width: 100%;
                 height: 100%;
             }
+
+            /* Make the icons larger in the user interface */
+            .reachability-control-settings-button
+            {
+                font-size: 22px;
+            }
         </style>
     </head>
 
@@ -101,7 +107,25 @@
                 mouseOverFn: highlightIsolines,
                 mouseOutFn: resetIsolines,
                 clickFn: clickIsolines,
-                markerFn: isolinesOrigin
+                markerFn: isolinesOrigin,
+                expandButtonContent: '',
+                expandButtonStyleClass: 'reachability-control-expand-button fa fa-bullseye',
+                collapseButtonContent: '',
+                collapseButtonStyleClass: 'reachability-control-collapse-button fa fa-caret-up',
+                drawButtonContent: '',
+                drawButtonStyleClass: 'fa fa-pencil',
+                deleteButtonContent: '',
+                deleteButtonStyleClass: 'fa fa-trash',
+                distanceButtonContent: '',
+                distanceButtonStyleClass: 'fa fa-road',
+                timeButtonContent: '',
+                timeButtonStyleClass: 'fa fa-clock-o',
+                drivingButtonContent: '',
+                drivingButtonStyleClass: 'fa fa-car',
+                cyclingButtonContent: '',
+                cyclingButtonStyleClass: 'fa fa-bicycle',
+                walkingButtonContent: '',
+                walkingButtonStyleClass: 'fa fa-male'
             }).addTo(map);
         </script>
     </body>
