@@ -110,6 +110,7 @@ L.Control.Reachability = L.Control.extend({
 
     onAdd: function (map) {
         // Initial settings
+        this.version = '1.0.0';
         this._map = map;
         this._collapsed = this.options.collapsed;
         this._drawMode = false;
