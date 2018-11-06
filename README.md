@@ -1,7 +1,7 @@
 # leaflet.reachability
 [Trafford Data Lab](https://www.trafforddatalab.io) plugin for the [Leaflet](https://leafletjs.com) JavaScript library to show areas of reachability based on time or distance for different modes of travel using the [openrouteservice isochrones API](https://openrouteservice.org/documentation/#/reference/isochrones).
 
-You can [view the demo](https://rawgit.com/trafforddatalab/leaflet.reachability/master/leaflet.reachability_example.html) to get an idea of what it can do, or view a more customised implementation (which uses more of the available styling options) in our [Explore mapping application](https://www.trafforddatalab.io/maps/explore/).
+You can [view the demo](https://www.trafforddatalab.io/leaflet.reachability/leaflet.reachability_example.html) to get an idea of what it can do, or view a more customised implementation (which uses more of the available styling options) in our [Explore mapping application](https://www.trafforddatalab.io/maps/explore/).
 
 We have published an [article](https://medium.com/@traffordDataLab/out-of-reach-introducing-our-distance-and-travel-time-plugin-859932cb12e5) explaining the benefits of using network buffers rather than euclidean distance when determining reachability as well as creating the following short videos demonstrating example uses for the plugin:
 - [How many facilities are within a 15 minute walk?](https://vimeo.com/291529944)
@@ -10,12 +10,12 @@ We have published an [article](https://medium.com/@traffordDataLab/out-of-reach-
 ## Documentation
 You will need to obtain a free API key from <a href="https://openrouteservice.org/dev/#/signup">openrouteservice</a> before using this plugin. Please do not use the key from the demo in your own applications.
 
-After including the CSS and JS in your page:...
+After including the CSS and JS in your page (NOTE - you can also use minified versions e.g. .min.js/.min.css if you prefer):...
 ```HTML
-<link rel="stylesheet" href="leaflet.reachability.css"/>
-<script src="leaflet.reachability.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/trafforddatalab/leaflet.reachability@v1.0.0/leaflet.reachability.css"/>
+<script src="https://cdn.jsdelivr.net/gh/trafforddatalab/leaflet.reachability@v1.0.0/leaflet.reachability.js"></script>
 <!-- Include below if you don't have your own preferred AJAX function/method (see options below) -->
-<script src="simple_ajax_request.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/trafforddatalab/leaflet.reachability@v1.0.0/simple_ajax_request.js"></script>
 ```
 
 ...you can then initialise the plugin in the standard Leaflet way adding it to a map instance:
@@ -246,6 +246,10 @@ The table below describes the contents of the polygon properties object:
 | `"Travel mode"` | String | The openrouteservice API mode of travel `profile` of the polygon. |
 
 These properties can be bound to a popup or displayed within a custom container when the user selects a reachability area etc.
+
+**Version**
+
+If the plugin was initialised with an object called `reachabilityControl`, you can obtain the version number using `reachabilityControl.version`. This will return a string in the [Semantic Versioning](https://semver.org/spec/v2.0.0.html) format `"MAJOR.MINOR.PATCH"` e.g. `"1.0.0"`.
 
 ### Examples
 
