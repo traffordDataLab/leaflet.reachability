@@ -639,54 +639,53 @@ L.Control.Reachability = L.Control.extend({
                             Reformat the data in the properties object to be more readable and informative
 
                             Returned values from API:
-                                value:      either metres or seconds depending on distance or time. Ignores the input in km or mi!
+                                area:       the area of the isochrone - if based on a distance in square units of the chosen distance, otherwise based on square kilometres
+                                value:      either metres or seconds depending if based on distance or time. Ignores the distance input in km or mi!
                                 total_pop:  integer value of people living in the area as given by Global Human Settlement (GHS) framework
                         */
                         for (var i = 0; i < data.features.length; i++) {
 
                             var props = data.features[i].properties;    // get the properties for the current feature
-                            var range,
+                            var area = props.area,
+                                range = props.value,
                                 rangeType,
                                 rangeUnits,
-                                area,
-                                rangeControlDistanceUnits = context.options.rangeControlDistanceUnits;
+                                rangeControlDistanceUnits = (context.options.rangeControlDistanceUnits == 'mi') ? 'miles' : context.options.rangeControlDistanceUnits;
 
-                            /*
-                                Assume for now that the range type is distance to calculate everything with the correct units.
-                                If the range type is actually time we'll overwrite the range values later.
-                                This method reduces the number of if conditions.
-                            */
-                            if (rangeControlDistanceUnits == 'mi') {
-                                rangeControlDistanceUnits = 'miles';
-                                range = L.Util.formatNum(props.value/1609.34, 2);           // convert metres to miles for the range
-                                area = L.Util.formatNum(props.total_area_km/2.58998811, 2); // convert area to square miles;
-                            }
-                            else if (context.options.rangeControlDistanceUnits == 'm') {
-                                range = L.Util.formatNum(props.value, 2);                   // no conversion necessary for the range
-                                area = L.Util.formatNum(props.total_area_km*1000000, 2);    // convert area to square metres
-                            }
-                            else {
-                                range = L.Util.formatNum(props.value/1000, 2);              // convert metres to kilometres for the range
-                                area = L.Util.formatNum(props.total_area_km, 2);            // no conversion necessary for the area
-                            }
-
-                            // Now perform the check on the range type to set the remaining values
                             if (context._rangeIsDistance) {
                                 rangeType = 'distance';
                                 rangeUnits = rangeControlDistanceUnits;
+
+                                // Sort out the range in correct units. As the isochrone is based on distance the value will be in metres.
+                                // If our range units are in miles or km then we need to convert value to match.
+                                if (rangeControlDistanceUnits == 'miles') {
+                                    range = range/1609.34;   // convert metres to miles for the range
+                                }
+                                else if (rangeControlDistanceUnits == 'km') {
+                                    range = range/1000;      // convert metres to kilometres for the range
+                                }
                             }
                             else {
                                 rangeType = 'time';
                                 rangeUnits = 'min';
-                                range = L.Util.formatNum(props.value/60, 2);
+                                range = range/60;            // convert seconds to minutes
+
+                                // Sort out the area in the correct units. As the isochrone is based on time the area will be in km^2.
+                                // However if the distance unit is metres or miles the area should reflect those units instead.
+                                if (rangeControlDistanceUnits == 'miles') {
+                                    area = area/2.58998811;  // convert area to square miles;
+                                }
+                                else if (rangeControlDistanceUnits == 'm') {
+                                    area = area*1000000;     // convert area to square metres
+                                }
                             }
 
                             var newProps = {
                                 'Travel mode': context._travelMode,
                                 'Measure': rangeType,
                                 'Range units': rangeUnits,
-                                'Range': range,
-                                'Area': area,
+                                'Range': L.Util.formatNum(range, 2),
+                                'Area': L.Util.formatNum(area, 2),
                                 'Area units': rangeControlDistanceUnits + '^2',
                                 'Latitude': props.center[1],
                                 'Longitude': props.center[0],
