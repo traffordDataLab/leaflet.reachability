@@ -12,10 +12,10 @@ You will need to obtain a free API key from <a href="https://openrouteservice.or
 
 After including the CSS and JS in your page (NOTE - you can also use minified versions e.g. .min.js/.min.css if you prefer):...
 ```HTML
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/trafforddatalab/leaflet.reachability@v1.0.0/leaflet.reachability.css"/>
-<script src="https://cdn.jsdelivr.net/gh/trafforddatalab/leaflet.reachability@v1.0.0/leaflet.reachability.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/trafforddatalab/leaflet.reachability@v1.0.1/leaflet.reachability.css"/>
+<script src="https://cdn.jsdelivr.net/gh/trafforddatalab/leaflet.reachability@v1.0.1/leaflet.reachability.js"></script>
 <!-- Include below if you don't have your own preferred AJAX function/method (see options below) -->
-<script src="https://cdn.jsdelivr.net/gh/trafforddatalab/leaflet.reachability@v1.0.0/simple_ajax_request.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/trafforddatalab/leaflet.reachability@v1.0.1/simple_ajax_request.js"></script>
 ```
 
 ...you can then initialise the plugin in the standard Leaflet way adding it to a map instance:
@@ -249,7 +249,7 @@ These properties can be bound to a popup or displayed within a custom container 
 
 **Version**
 
-If the plugin was initialised with an object called `reachabilityControl`, you can obtain the version number using `reachabilityControl.version`. This will return a string in the [Semantic Versioning](https://semver.org/spec/v2.0.0.html) format `"MAJOR.MINOR.PATCH"` e.g. `"1.0.0"`.
+If the plugin was initialised with an object called `reachabilityControl`, you can obtain the version number using `reachabilityControl.version`. This will return a string in the [Semantic Versioning](https://semver.org/spec/v2.0.0.html) format `"MAJOR.MINOR.PATCH"` e.g. `"1.0.1"`.
 
 ### Examples
 
