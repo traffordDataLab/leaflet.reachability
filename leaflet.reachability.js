@@ -153,6 +153,14 @@ L.Control.Reachability = L.Control.extend({
         this._map.fire('reachability:control_removed');
     },
 
+    _decimalPlaces: function (n) {
+        // Function to calculate the number of decimal places in a given number.
+        // Converts input to a string so won't error if NaN.
+        // If a decimal point is found it returns the number of characters to the right, otherwise it returns 0.
+    	n = String(n);
+      	return (n.indexOf('.') > -1) ? n.length-n.indexOf('.')-1 : 0;
+    },
+
     _createUI: function () {
         // Container for the user interface controls - these will be displayed permanently if the collapsed option is false, otherwise when the user clicks on the collapsed control toggle button
         this._uiContainer = L.DomUtil.create('div', this.options.settingsContainerStyleClass);
@@ -193,6 +201,10 @@ L.Control.Reachability = L.Control.extend({
         // ***************************************************************************************
 
 
+        // Calculate the greatest number of decimal places required for the values displayed in the distance and time range select lists.
+        var decimalPlacesDistance = Math.max(this._decimalPlaces(this.options.rangeControlDistanceMin), this._decimalPlaces(this.options.rangeControlDistanceMax), this._decimalPlaces(this.options.rangeControlDistanceInterval));
+        var decimalPlacesTime = Math.max(this._decimalPlaces(this.options.rangeControlTimeMin), this._decimalPlaces(this.options.rangeControlTimeMax), this._decimalPlaces(this.options.rangeControlTimeInterval));
+
         // Distance range title
         this._rangeDistanceTitle = L.DomUtil.create('span', 'reachability-control-range-title reachability-control-hide-content', this._uiContainer);
         this._rangeDistanceTitle.innerHTML = this.options.rangeControlDistanceTitle;
@@ -200,6 +212,8 @@ L.Control.Reachability = L.Control.extend({
         // Distance range control
         this._rangeDistanceList = L.DomUtil.create('select', 'reachability-control-range-list reachability-control-hide-content', this._uiContainer);
         for (var i = this.options.rangeControlDistanceMin; i <= this.options.rangeControlDistanceMax; i += this.options.rangeControlDistanceInterval) {
+            if (String(i).length > i.toFixed(decimalPlacesDistance).length) i = parseFloat(i.toFixed(decimalPlacesDistance)); // this is to avoid issues of 0.30000000000000004 being calculated instead of an expected value of 0.3 etc. (see https://floating-point-gui.de/)
+
             var opt = L.DomUtil.create('option', '', this._rangeDistanceList);
             opt.setAttribute('value', i);
             opt.innerHTML = i + ' ' + this.options.rangeControlDistanceUnits;
@@ -213,6 +227,8 @@ L.Control.Reachability = L.Control.extend({
         // Time range control
         this._rangeTimeList = L.DomUtil.create('select', 'reachability-control-range-list reachability-control-hide-content', this._uiContainer);
         for (var i = this.options.rangeControlTimeMin; i <= this.options.rangeControlTimeMax; i += this.options.rangeControlTimeInterval) {
+            if (String(i).length > i.toFixed(decimalPlacesTime).length) i = parseFloat(i.toFixed(decimalPlacesTime)); // this is to avoid issues of 0.30000000000000004 being calculated instead of an expected value of 0.3 etc. (see https://floating-point-gui.de/)
+
             var opt = L.DomUtil.create('option', '', this._rangeTimeList);
             opt.setAttribute('value', i);
             opt.innerHTML = i + ' min';
@@ -589,9 +605,7 @@ L.Control.Reachability = L.Control.extend({
     // Main function to make the actual call to the API and display the resultant isoline group on the map
     _callApi: function (latLng) {
         // Create the URL to pass to the API
-        var apiUrl = 'https://api.openrouteservice.org/isochrones?api_key=' + this.options.apiKey;
-
-        apiUrl += '&locations=' + latLng.lng + '%2C' + latLng.lat;
+        var apiUrl = 'https://api.openrouteservice.org/isochrones?api_key=' + this.options.apiKey + '&locations=' + latLng.lng + '%2C' + latLng.lat + '&profile=' + this._travelMode + '&location_type=start&attributes=area|total_pop';
 
         if (this._rangeIsDistance) {
             apiUrl += '&range_type=distance&units=' + this.options.rangeControlDistanceUnits + '&range=' + this._rangeDistanceList.value;
@@ -601,8 +615,6 @@ L.Control.Reachability = L.Control.extend({
             apiUrl += '&range_type=time&range=' + this._rangeTimeList.value * 60;
             if (this._showInterval.checked) apiUrl += '&interval=' + this.options.rangeControlTimeInterval * 60;
         }
-
-        apiUrl += '&profile=' + this._travelMode + '&location_type=start&attributes=area|total_pop';
 
         // Inform that we are calling the API - could be useful for starting a spinner etc. to indicate to the user that something is happening if there is a delay
         this._map.fire('reachability:api_call_start');
