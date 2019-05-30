@@ -1,7 +1,7 @@
 # leaflet.reachability
 [Trafford Data Lab](https://www.trafforddatalab.io) plugin for the [Leaflet](https://leafletjs.com) JavaScript library to show areas of reachability based on time or distance for different modes of travel using the [openrouteservice isochrones API](https://openrouteservice.org/documentation/#/reference/isochrones).
 
-You can [view the demo](https://www.trafforddatalab.io/leaflet.reachability/leaflet.reachability_example.html) to get an idea of what it can do, or view a more customised implementation (which uses more of the available styling options) in our [Explore mapping application](https://www.trafforddatalab.io/maps/explore/).
+You can [view the demo](https://www.trafforddatalab.io/leaflet.reachability/leaflet.reachability_example.html) to get an idea of what it can do, or view a more customised implementation (which uses more of the available styling options) in our [Explore mapping application](https://www.trafforddatalab.io/explore/).
 
 We have published an [article](https://medium.com/@traffordDataLab/out-of-reach-introducing-our-distance-and-travel-time-plugin-859932cb12e5) explaining the benefits of using network buffers rather than euclidean distance when determining reachability as well as creating the following short videos demonstrating example uses for the plugin:
 - [How many facilities are within a 15 minute walk?](https://vimeo.com/291529944)
