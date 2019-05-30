@@ -2,7 +2,7 @@
     Created:        2018/07/27 by James Austin - Trafford Data Lab
     Purpose:        Provided as an accompaniment to our leaflet.reachability plugin - provides a simple method to fetch data from an API using a GET request via AJAX and pass the parsed JSON data back via a callback function.
     Dependencies:   None
-    Licence:        https://www.trafforddatalab.io/assets/LICENSE.txt
+    Licence:        https://github.com/traffordDataLab/leaflet.reachability/blob/master/LICENSE
 */
 function simpleAjaxRequest(url, callback) {
     if (window.XMLHttpRequest) {
