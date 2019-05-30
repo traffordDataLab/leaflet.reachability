@@ -48,7 +48,7 @@ This is the minimum code required and will use all the default settings. If you 
 
 The plugin has many options, e.g. for controlling the appearance of the user-interface, (allowing icons from popular services such as [Font Awesome](https://fontawesome.com/) to be used), styling the reachability polygons and markers as well as incorporating many of the [openrouteservice API options](https://openrouteservice.org/documentation/#/reference/isochrones/isochrones/isochrones-service). Therefore the list of options in the tables below are presented in sections based on their use. The options within each section are listed in alphabetical order except when grouping related options or introducing certain options first makes more sense.
 
-**PLEASE NOTE:** *the options below contain entries for accessible travel mode. This feature is currently unavailable from openrouteservice, however it is due to be activated very soon. Once activated this feature will be enabled in the plugin.*
+**PLEASE NOTE:** *the options below contain entries for accessible travel mode. This feature is currently unavailable but will be implemented in a future release of the plugin.*
 
 **Main options**
 
@@ -72,6 +72,8 @@ These are the general setup options for the plugin control e.g. where it appears
 **User interface options**
 
 The options below control the styling and content of the user interface as well as for choosing which reachability options should be selected by default.
+
+*NOTE: The maximum number of isochrones which can be requested at one time from the API is 10. Care should be taken with the values chosen for the minimum, maximum and interval values for the distance and time ranges. If the user selects the intervals checkbox it is possible that the maximum isochrone request number could be exceeded. Take the following distance (km) example: `rangeControlDistanceMin` = 0.5, `rangeControlDistanceMax` = 1.1, `rangeControlDistanceInterval` = 0.1. The range select list would contain 7 items (0.5km - 1.1km) but if the user selected 1.1km with intervals they would be requesting 11 isochrones (0 to 0.1km, 0.2km, 0.3km, 0.4km, 0.5km, 0.6km, 0.7km, 0.8km, 0.9km, 1km, 1.1km), which would result in an error.*
 
 | Option                          | Type   | Default                                     | Description |
 | ------------------------------- | ------ | ------------------------------------------- | ----------- |
@@ -107,14 +109,14 @@ The options below control the styling and content of the user interface as well 
 | `travelModeDefault`             | String | `null`                                      | Sets the default travel profile. If this is not equal to one of the travel profile options (see openrouteservice API options below) it will use the value of `travelModeDrivingProfile` |
 | `rangeControlDistanceTitle`     | String | `"Dist."`                                   | Title displayed above the range select list when distance is selected as the reachability measure. |
 | `rangeControlDistanceUnits`     | String | `"km"`                                      | Units for the distance measure. Can be `"m"` (metres), `"km"` (kilometres) or `"mi"` (miles). Corresponds to `units` in the API documentation. |
-| `rangeControlDistanceMin`       | Number | `0.5`                                       | Minimum distance value to calculate reachability, measured in `rangeControlDistanceUnits`. |
-| `rangeControlDistanceMax`       | Number | `3`                                         | Maximum distance value to calculate reachability, measured in `rangeControlDistanceUnits`. |
+| `rangeControlDistanceMin`       | Number | `0.5`                                       | Minimum distance value to display in the range selection list, measured in `rangeControlDistanceUnits`. |
+| `rangeControlDistanceMax`       | Number | `3`                                         | Maximum distance value to display in the range selection list, measured in `rangeControlDistanceUnits`. |
 | `rangeControlDistanceInterval`  | Number | `0.5`                                       | Distance intervals between the `rangeControlDistanceMin` and `rangeControlDistanceMax` values, measured in `rangeControlDistanceUnits`. Corresponds to `interval` in the API documentation. |
 | `rangeControlTimeTitle`         | String | `"Time"`                                    | Title displayed above the range select list when time is selected as the reachability measure. |
-| `rangeControlTimeMin`           | Number | `5`                                         | Minimum time value to calculate reachability, measured in minutes but multipled by 60 to convert to seconds when passed to the API as this is the only unit of time allowed. |
-| `rangeControlTimeMax`           | Number | `30`                                        | Maximum time value to calculate reachability, measured in minutes but multipled by 60 to convert to seconds when passed to the API as this is the only unit of time allowed. |
+| `rangeControlTimeMin`           | Number | `5`                                         | Minimum time value to display in the range selection list, measured in minutes but multipled by 60 to convert to seconds when passed to the API as this is the only unit of time allowed. |
+| `rangeControlTimeMax`           | Number | `30`                                        | Maximum time value to display in the range selection list, measured in minutes but multipled by 60 to convert to seconds when passed to the API as this is the only unit of time allowed. |
 | `rangeControlTimeInterval`      | Number | `5`                                         | Time intervals between the `rangeControlTimeMin` and `rangeControlTimeMax` values, measured in minutes but multipled by 60 to convert to seconds when passed to the API as this is the only unit of time allowed. Corresponds to `interval` in the API documentation. |
-| `rangeIntervalsLabel`           | String | `"intervals"`                               | Text displayed next to the checkbox which controls whether reachability areas should be drawn for all intervals between the minumum and the value chosen by the user or just the chosen value. |
+| `rangeIntervalsLabel`           | String | `"intervals"`                               | Text displayed next to the checkbox which controls whether reachability areas should be drawn for all intervals up to the value chosen by the user or just the chosen value. |
 
 **Reachability polygon options**
 
