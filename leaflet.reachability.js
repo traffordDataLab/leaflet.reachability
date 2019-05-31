@@ -72,13 +72,13 @@ L.Control.Reachability = L.Control.extend({
 
         // Control for the range parameter
         rangeControlDistanceTitle: 'Dist.',
-        rangeControlDistanceMin: 0.5,
+        rangeControlDistance: null,                     // Custom range specified as an array which supersedes rangeControlDistanceMax and rangeControlDistanceInterval if not null
         rangeControlDistanceMax: 3,
         rangeControlDistanceInterval: 0.5,
         rangeControlDistanceUnits: 'km',                // Can be either 'm', 'km' or 'mi'
 
         rangeControlTimeTitle: 'Time',
-        rangeControlTimeMin: 5,                         // \
+        rangeControlTime: null,                         // \  Custom range specified as an array which supersedes rangeControlTimeMax and rangeControlTimeInterval if not null
         rangeControlTimeMax: 30,                        //  > All these values will be multiplied by 60 to convert to seconds - no other unit of time is allowed
         rangeControlTimeInterval: 5,                    // /
 
@@ -196,14 +196,7 @@ L.Control.Reachability = L.Control.extend({
 
         // Accessible profile button
         this._accessibilityControl = this._createButton('span', this.options.accessibilityButtonContent, this.options.accessibilityButtonTooltip, this.options.settingsButtonStyleClass + ' ' + this.options.accessibilityButtonStyleClass, this._modesContainer, this._setTravelAccessibility);
-        // *** NOTE: TEMPORARY LINE BELOW WHILST ACCESSIBILITY ROUTING IS UNAVAILABLE FROM THE API
-        L.DomUtil.addClass(this._accessibilityControl, 'reachability-control-hide-content');
-        // ***************************************************************************************
 
-
-        // Calculate the greatest number of decimal places required for the values displayed in the distance and time range select lists.
-        var decimalPlacesDistance = Math.max(this._decimalPlaces(this.options.rangeControlDistanceMin), this._decimalPlaces(this.options.rangeControlDistanceMax), this._decimalPlaces(this.options.rangeControlDistanceInterval));
-        var decimalPlacesTime = Math.max(this._decimalPlaces(this.options.rangeControlTimeMin), this._decimalPlaces(this.options.rangeControlTimeMax), this._decimalPlaces(this.options.rangeControlTimeInterval));
 
         // Distance range title
         this._rangeDistanceTitle = L.DomUtil.create('span', 'reachability-control-range-title reachability-control-hide-content', this._uiContainer);
@@ -211,12 +204,25 @@ L.Control.Reachability = L.Control.extend({
 
         // Distance range control
         this._rangeDistanceList = L.DomUtil.create('select', 'reachability-control-range-list reachability-control-hide-content', this._uiContainer);
-        for (var i = this.options.rangeControlDistanceMin; i <= this.options.rangeControlDistanceMax; i += this.options.rangeControlDistanceInterval) {
-            if (String(i).length > i.toFixed(decimalPlacesDistance).length) i = parseFloat(i.toFixed(decimalPlacesDistance)); // this is to avoid issues of 0.30000000000000004 being calculated instead of an expected value of 0.3 etc. (see https://floating-point-gui.de/)
+        if (this.options.rangeControlDistance == null) {
+            // Calculate the greatest number of decimal places required for the values displayed in the select list.
+            var decimalPlacesDistance = Math.max(this._decimalPlaces(this.options.rangeControlDistanceMax), this._decimalPlaces(this.options.rangeControlDistanceInterval));
 
-            var opt = L.DomUtil.create('option', '', this._rangeDistanceList);
-            opt.setAttribute('value', i);
-            opt.innerHTML = i + ' ' + this.options.rangeControlDistanceUnits;
+            for (var i = this.options.rangeControlDistanceInterval; i <= this.options.rangeControlDistanceMax; i += this.options.rangeControlDistanceInterval) {
+                if (String(i).length > i.toFixed(decimalPlacesDistance).length) i = parseFloat(i.toFixed(decimalPlacesDistance)); // this is to avoid issues of 0.30000000000000004 being calculated instead of an expected value of 0.3 etc. (see https://floating-point-gui.de/)
+
+                var opt = L.DomUtil.create('option', '', this._rangeDistanceList);
+                opt.setAttribute('value', i);
+                opt.innerHTML = i + ' ' + this.options.rangeControlDistanceUnits;
+            }
+        }
+        else {
+            // Create select list options using the range array
+            for (var i = 0; i < this.options.rangeControlDistance.length; i++) {
+                var opt = L.DomUtil.create('option', '', this._rangeDistanceList);
+                opt.setAttribute('value', this.options.rangeControlDistance[i]);
+                opt.innerHTML = this.options.rangeControlDistance[i] + ' ' + this.options.rangeControlDistanceUnits;
+            }
         }
 
 
@@ -226,12 +232,25 @@ L.Control.Reachability = L.Control.extend({
 
         // Time range control
         this._rangeTimeList = L.DomUtil.create('select', 'reachability-control-range-list reachability-control-hide-content', this._uiContainer);
-        for (var i = this.options.rangeControlTimeMin; i <= this.options.rangeControlTimeMax; i += this.options.rangeControlTimeInterval) {
-            if (String(i).length > i.toFixed(decimalPlacesTime).length) i = parseFloat(i.toFixed(decimalPlacesTime)); // this is to avoid issues of 0.30000000000000004 being calculated instead of an expected value of 0.3 etc. (see https://floating-point-gui.de/)
+        if (this.options.rangeControlTime == null) {
+            // Calculate the greatest number of decimal places required for the values displayed in the select list.
+            var decimalPlacesTime = Math.max(this._decimalPlaces(this.options.rangeControlTimeMax), this._decimalPlaces(this.options.rangeControlTimeInterval));
 
-            var opt = L.DomUtil.create('option', '', this._rangeTimeList);
-            opt.setAttribute('value', i);
-            opt.innerHTML = i + ' min';
+            for (var i = this.options.rangeControlTimeInterval; i <= this.options.rangeControlTimeMax; i += this.options.rangeControlTimeInterval) {
+                if (String(i).length > i.toFixed(decimalPlacesTime).length) i = parseFloat(i.toFixed(decimalPlacesTime)); // this is to avoid issues of 0.30000000000000004 being calculated instead of an expected value of 0.3 etc. (see https://floating-point-gui.de/)
+
+                var opt = L.DomUtil.create('option', '', this._rangeTimeList);
+                opt.setAttribute('value', i);
+                opt.innerHTML = i + ' min';
+            }
+        }
+        else {
+            // Create select list options using the range array
+            for (var i = 0; i < this.options.rangeControlTime.length; i++) {
+                var opt = L.DomUtil.create('option', '', this._rangeTimeList);
+                opt.setAttribute('value', this.options.rangeControlTime[i]);
+                opt.innerHTML = this.options.rangeControlTime[i] + ' min';
+            }
         }
 
 
@@ -607,13 +626,36 @@ L.Control.Reachability = L.Control.extend({
         // Create the URL to pass to the API
         var apiUrl = 'https://api.openrouteservice.org/isochrones?api_key=' + this.options.apiKey + '&locations=' + latLng.lng + '%2C' + latLng.lat + '&profile=' + this._travelMode + '&location_type=start&attributes=area|total_pop';
 
+        var arrRange = [];      // the array to hold either the single range value or multiple values if the intervals have been requested
+        var optionsIndex = 0;   // index of the range collection
+
         if (this._rangeIsDistance) {
-            apiUrl += '&range_type=distance&units=' + this.options.rangeControlDistanceUnits + '&range=' + this._rangeDistanceList.value;
-            if (this._showInterval.checked) apiUrl += '&interval=' + this.options.rangeControlDistanceInterval;
+            if (this._showInterval.checked) {
+                do {
+                    arrRange.push(this._rangeDistanceList[optionsIndex].value);
+                    optionsIndex++;
+                }
+                while (optionsIndex <= this._rangeDistanceList.selectedIndex);
+            }
+            else {
+                arrRange.push(this._rangeDistanceList.value);
+            }
+
+            apiUrl += '&range_type=distance&units=' + this.options.rangeControlDistanceUnits + '&range=' + arrRange;
         }
         else {
-            apiUrl += '&range_type=time&range=' + this._rangeTimeList.value * 60;
-            if (this._showInterval.checked) apiUrl += '&interval=' + this.options.rangeControlTimeInterval * 60;
+            if (this._showInterval.checked) {
+                do {
+                    arrRange.push(this._rangeTimeList[optionsIndex].value * 60);
+                    optionsIndex++;
+                }
+                while (optionsIndex <= this._rangeTimeList.selectedIndex);
+            }
+            else {
+                arrRange.push(this._rangeTimeList.value * 60);
+            }
+
+            apiUrl += '&range_type=time&range=' + arrRange;
         }
 
         // Inform that we are calling the API - could be useful for starting a spinner etc. to indicate to the user that something is happening if there is a delay
