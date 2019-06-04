@@ -87,7 +87,6 @@ L.Control.Reachability = L.Control.extend({
 
         // API settings
         apiKey: '',                                     // openrouteservice API key - the service which returns the isoline polygons based on the various options/parameters
-        ajaxRequestFn: null,                            // External function to make the actual call to the API via AJAX - default is to use the simple function simple_ajax_request.js bundled with the plugin
         travelModeDrivingProfile: 'driving-car',        // API choices are 'driving-car' and 'driving-hgv'
         travelModeCyclingProfile: 'cycling-regular',    // API choices are 'cycling-regular', 'cycling-road', 'cycling-safe', 'cycling-mountain' and 'cycling-tour'
         travelModeWalkingProfile: 'foot-walking',       // API choices are 'foot-walking' and 'foot-hiking'
@@ -623,237 +622,147 @@ L.Control.Reachability = L.Control.extend({
 
     // Main function to make the actual call to the API and display the resultant isoline group on the map
     _callApi: function (latLng) {
-        // Create the URL to pass to the API
-        var apiUrl = 'https://api.openrouteservice.org/isochrones?api_key=' + this.options.apiKey + '&locations=' + latLng.lng + '%2C' + latLng.lat + '&profile=' + this._travelMode + '&location_type=start&attributes=area|total_pop';
+        if (window.XMLHttpRequest) {
+            // Start setting up the body of the request which contains most of the parameters
+            var requestBody = '{"locations":[[' + latLng.lng + ',' + latLng.lat + ']],"attributes":["area","total_pop","reachfactor"],"smoothing":0,';
 
-        var arrRange = [];      // the array to hold either the single range value or multiple values if the intervals have been requested
-        var optionsIndex = 0;   // index of the range collection
+            // The next part of the request body depends on the options and values selected by the user
+            var arrRange = [];      // the array to hold either the single range value or multiple values if the intervals have been requested
+            var optionsIndex = 0;   // index of the range collection
 
-        if (this._rangeIsDistance) {
-            if (this._showInterval.checked) {
-                do {
-                    arrRange.push(this._rangeDistanceList[optionsIndex].value);
-                    optionsIndex++;
-                }
-                while (optionsIndex <= this._rangeDistanceList.selectedIndex);
-            }
-            else {
-                arrRange.push(this._rangeDistanceList.value);
-            }
-
-            apiUrl += '&range_type=distance&units=' + this.options.rangeControlDistanceUnits + '&range=' + arrRange;
-        }
-        else {
-            if (this._showInterval.checked) {
-                do {
-                    arrRange.push(this._rangeTimeList[optionsIndex].value * 60);
-                    optionsIndex++;
-                }
-                while (optionsIndex <= this._rangeTimeList.selectedIndex);
-            }
-            else {
-                arrRange.push(this._rangeTimeList.value * 60);
-            }
-
-            apiUrl += '&range_type=time&range=' + arrRange;
-        }
-
-        // Inform that we are calling the API - could be useful for starting a spinner etc. to indicate to the user that something is happening if there is a delay
-        this._map.fire('reachability:api_call_start');
-
-        // Store the context for use within the API callback below
-        var context = this;
-
-        // Call the API
-        try {
-            var ajaxFn = (this.options.ajaxRequestFn == null) ? simpleAjaxRequest : this.options.ajaxRequestFn; // This is the external function to use which makes the actual AJAX request to the API
-
-            ajaxFn(apiUrl, function (data) {
-                if (data == null) {
-                    // Fire event to inform that no data was returned
-                    context._map.fire('reachability:no_data');
-
-                    // Log more specific details in the javascript console
-                    if (window.console && window.console.log) window.console.log('Leaflet.reachability.js error calling API, no data returned. Likely cause is API unavailable or bad parameters.');
-
-                    // Inform the user that something went wrong and deactivate the draw control
-                    context._showError(context._drawControl);
-                    context._deactivateDraw();
+            if (this._rangeIsDistance) {
+                if (this._showInterval.checked) {
+                    do {
+                        arrRange.push(this._rangeDistanceList[optionsIndex].value);
+                        optionsIndex++;
+                    }
+                    while (optionsIndex <= this._rangeDistanceList.selectedIndex);
                 }
                 else {
-                    /*
-                        NOTE: The GeoJSON features returned from the API are in the order smallest to largest in terms of the area of the polygons.
-                        This causes us a problem as when they are displayed on the map, the largest polygon covers all the others, preventing us interacting with the other polygons.
-                        The solution is to reverse the order of the features in the GeoJSON before we create the Leaflet L.geoJSON object.
-                    */
-                    if (data.hasOwnProperty('features')) {
-                        data.features.reverse();    // reverse the order of the features array
+                    arrRange.push(this._rangeDistanceList.value);
+                }
 
-                        /*
-                            Reformat the data in the properties object to be more readable and informative
+                requestBody += '"range_type":"distance","units":"' + this.options.rangeControlDistanceUnits + '"';
+            }
+            else {
+                if (this._showInterval.checked) {
+                    do {
+                        arrRange.push(this._rangeTimeList[optionsIndex].value * 60);
+                        optionsIndex++;
+                    }
+                    while (optionsIndex <= this._rangeTimeList.selectedIndex);
+                }
+                else {
+                    arrRange.push(this._rangeTimeList.value * 60);
+                }
 
-                            Returned values from API:
-                                area:       the area of the isochrone - if based on a distance in square units of the chosen distance, otherwise based on square kilometres
-                                value:      either metres or seconds depending if based on distance or time. Ignores the distance input in km or mi!
-                                total_pop:  integer value of people living in the area as given by Global Human Settlement (GHS) framework
-                        */
-                        for (var i = 0; i < data.features.length; i++) {
+                requestBody += '"range_type":"time"';
+            }
 
-                            var props = data.features[i].properties;    // get the properties for the current feature
-                            var area = props.area,
-                                range = props.value,
-                                rangeType,
-                                rangeUnits,
-                                rangeControlDistanceUnits = (context.options.rangeControlDistanceUnits == 'mi') ? 'miles' : context.options.rangeControlDistanceUnits;
+            // The area units are the same no matter whether based on distance or time, and add the range to finished the request body
+            requestBody += ',"area_units":"' + this.options.rangeControlDistanceUnits + '","range":[' + arrRange.toString() + ']}';
 
-                            if (context._rangeIsDistance) {
-                                rangeType = 'distance';
-                                rangeUnits = rangeControlDistanceUnits;
+            // Setup the request object and associated items
+            var request = new XMLHttpRequest();
 
-                                // Sort out the range in correct units. As the isochrone is based on distance the value will be in metres.
-                                // If our range units are in miles or km then we need to convert value to match.
-                                if (rangeControlDistanceUnits == 'miles') {
-                                    range = range/1609.34;   // convert metres to miles for the range
-                                }
-                                else if (rangeControlDistanceUnits == 'km') {
-                                    range = range/1000;      // convert metres to kilometres for the range
-                                }
-                            }
-                            else {
-                                rangeType = 'time';
-                                rangeUnits = 'min';
-                                range = range/60;            // convert seconds to minutes
+            request.open('POST', 'https://api.openrouteservice.org/v2/isochrones/' + this._travelMode);
 
-                                // Sort out the area in the correct units. As the isochrone is based on time the area will be in km^2.
-                                // However if the distance unit is metres or miles the area should reflect those units instead.
-                                if (rangeControlDistanceUnits == 'miles') {
-                                    area = area/2.58998811;  // convert area to square miles;
-                                }
-                                else if (rangeControlDistanceUnits == 'm') {
-                                    area = area*1000000;     // convert area to square metres
-                                }
-                            }
+            request.setRequestHeader('Content-Type', 'application/geo+json; charset=utf-8');
+            request.setRequestHeader('Authorization', this.options.apiKey);
 
-                            var newProps = {
-                                'Travel mode': context._travelMode,
-                                'Measure': rangeType,
-                                'Range units': rangeUnits,
-                                'Range': L.Util.formatNum(range, 2),
-                                'Area': L.Util.formatNum(area, 2),
-                                'Area units': rangeControlDistanceUnits + '^2',
-                                'Latitude': props.center[1],
-                                'Longitude': props.center[0],
-                                'Population': props.total_pop
-                            }
+            // Setup the callback function to deal with the response from the API
+            request.onreadystatechange = function () {
+                // Wait until the operation has completed, either successfully or failed
+                if (this.readyState === 4) {
+                    // Decide what to do based on the response status
+                    if (this.status === 200) {
+                        // We have a successful response.
+                        var data = JSON.parse(this.responseText);
 
-                            // Replace the old properties object with the new one
-                            data.features[i].properties = newProps;
+                        // Now check if the response contains GeoJSON layers etc.
+                        if (data.hasOwnProperty('features')) {
+                            data.features.reverse();    // reverse the order of the features array
+
+                            // *********** DEBUG ONLY - REMOVE ***********
+                            console.log(data);
+                            // *******************************************
+
+
+
+
+
+
+
+
+
+
+
+
                         }
+                        else {
+                            context.latestIsolines = null;
 
-                        // Create a Leaflet GeoJSON FeatureGroup object from the GeoJSON returned from the API - This is intended to be accessible externally if required
-                        context.latestIsolines = L.geoJSON(data, { style: context.options.styleFn, pane: context.options.pane });
+                            // Fire event to inform that no data was returned
+                            context._map.fire('reachability:no_data');
 
-                        context.latestIsolines.eachLayer(function (layer) {
-                            // Iterate through each layer adding events if applicable
-                            layer.on({
-                                mouseover: (function (e) { if (context.options.mouseOverFn != null) context.options.mouseOverFn(e) }),
-                                mouseout: (function (e) { if (context.options.mouseOutFn != null) context.options.mouseOutFn(e) }),
-                                click: (function(e) {
-                                    if (context._deleteMode) {
-                                        // If we're in delete mode, call the delete function
-                                        L.DomEvent.stopPropagation(e);
-                                        context._delete(e);
-                                    }
-                                    else {
-                                        // Otherwise, if there is a user-defined click function, call that instead
-                                        if (context.options.clickFn != null) context.options.clickFn(e);
-                                    }
-                                })
-                            });
-                        });
-
-                        // Create a marker at the latlng if desired. Can be used to indicate the mode of travel etc.
-                        if (context.options.showOriginMarker) {
-                            var originMarker;
-
-                            if (context.options.markerFn != null) {
-                                // Expecting a custom Leaflet marker to be returned for the origin of the isolines group.
-                                // Passing the relevant factors to the function so that styling can be based on mode of travel, distance or time etc.
-                                originMarker = context.options.markerFn(latLng, context._travelMode, rangeType);
-                            }
-                            else {
-                                // Create a default marker for the origin of the isolines group
-                                originMarker = L.circleMarker(latLng, { radius: 3, weight: 0, fillColor: '#0073d4', fillOpacity: 1 });
+                            // Log more specific details in the javascript console
+                            if (window.console && window.console.log) {
+                                window.console.log('Leaflet.reachability.js: API returned data but no GeoJSON layers. Details of response received below:');
+                                window.console.log('Status:', this.status);
+                                window.console.log('Headers:', this.getAllResponseHeaders());
+                                window.console.log(this.responseText);
                             }
 
-                            // Attach events if required
-                            originMarker.on({
-                                mouseover: (function (e) { if (context.options.markerOverFn != null) context.options.markerOverFn(e) }),
-                                mouseout: (function (e) { if (context.options.markerOutFn != null) context.options.markerOutFn(e) }),
-                                click: (function(e) {
-                                    if (context._deleteMode) {
-                                        // If we're in delete mode, call the delete function
-                                        L.DomEvent.stopPropagation(e);
-                                        context._delete(e);
-                                    }
-                                    else {
-                                        // Otherwise, if there is a user-defined click function, call that instead
-                                        if (context.options.markerClickFn != null) context.options.markerClickFn(e);
-                                    }
-                                })
-                            });
-
-                            // Add the marker to the isolines GeoJSON
-                            originMarker.addTo(context.latestIsolines);
+                            // Inform the user that something went wrong and deactivate the draw control
+                            context._showError(context._drawControl);
+                            context._deactivateDraw();
                         }
-
-                        // Add the newly created isolines GeoJSON to the overall GeoJSON FeatureGroup
-                        context.latestIsolines.addTo(context.isolinesGroup);
-
-                        // Add the isolines GeoJSON FeatureGroup to the map if it isn't already
-                        if (!context._map.hasLayer(context.isolinesGroup)) context.isolinesGroup.addTo(context._map);
-
-                        // Fire event to inform that isolines have been drawn successfully
-                        context._map.fire('reachability:displayed');
                     }
                     else {
-                        context.latestIsolines = null;
+                        // Request failed for some reason, output response to console if possible
+                        if (window.console && window.console.log) {
+                            window.console.log('Leaflet.reachability.js error. Details of response received below:');
+                            window.console.log('Status:', this.status);
+                            window.console.log('Headers:', this.getAllResponseHeaders());
+                            window.console.log(this.responseText);
+                        }
 
-                        // Fire event to inform that no data was returned
+                        context._map.fire('reachability:error');
                         context._map.fire('reachability:no_data');
-
-                        // Log more specific details in the javascript console
-                        if (window.console && window.console.log) window.console.log('Leaflet.reachability.js: API returned data but no GeoJSON layers.');
 
                         // Inform the user that something went wrong and deactivate the draw control
                         context._showError(context._drawControl);
                         context._deactivateDraw();
                     }
+
+                    // Whether successful or not, inform that we have completed calling the API - could be useful for stopping a spinner etc. to indicate to the user that something was happening.
+                    context._map.fire('reachability:api_call_end');
+
+                    // Get ready to register another draw request
+                    context._drawRequestRegistered = false;
                 }
+            };
 
-                // Inform that we have completed calling the API - could be useful for stopping a spinner etc. to indicate to the user that something was happening. Doesn't indicate success
-                context._map.fire('reachability:api_call_end');
+            // Inform that we are calling the API - could be useful for starting a spinner etc. to indicate to the user that something is happening if there is a delay
+            this._map.fire('reachability:api_call_start');
 
-                // Get ready to register another draw request
-                context._drawRequestRegistered = false;
-            });
+            // Store the context for use within the API callback
+            var context = this;
+
+            // Make the call to the API
+            request.send(requestBody);
         }
-        catch (e) {
-            // Fire event to inform that an error occurred calling the API
+        else {
+            // Browser is not capable of making the request so fire error and no data events
             context._map.fire('reachability:error');
-
-            // Fire event to inform that no data was returned
             context._map.fire('reachability:no_data');
-
-            // Inform that we have completed calling the API - could be useful for stopping a spinner etc. to indicate to the user that something was happening.
-            context._map.fire('reachability:api_call_end');
-
-            // Log the error in the console
-            if (window.console && window.console.log) window.console.log('Leaflet.reachability.js error attempting to call API.\nLikely cause is function simpleAjaxRequest has not been included and no alternative has been specified.\nSee docs for more details, actual error below.\n' + e);
 
             // Inform the user that something went wrong and deactivate the draw control
             context._showError(context._drawControl);
             context._deactivateDraw();
+
+            // Log more specific details in the javascript console
+            if (window.console && window.console.log) window.console.log('Leaflet.reachability.js error. Browser does not support XMLHttpRequest so is not capable of making the request to the API');
         }
     }
 });
