@@ -625,6 +625,30 @@ L.Control.Reachability = L.Control.extend({
         }
     },
 
+    // Handles the logging of information to the console, firing of events to inform about the error and handling the UI to reflect that an error occurred
+    _handleError: function (obj) {
+        // Output response to console if possible
+        if (window.console && window.console.log) {
+            if (obj.message != null) window.console.log(obj.message);
+            if (obj.requestResult != null) {
+                window.console.log('Status:', obj.requestResult.status);
+                window.console.log('Headers:', obj.requestResult.getAllResponseHeaders());
+                window.console.log(obj.requestResult.response);
+            }
+        }
+
+        // Fire events
+        if (obj.events != null && obj.events.length > 0) {
+            for (var i = 0; i < obj.events.length; i++) {
+                obj.context._map.fire('reachability:' + obj.events[i]);
+            }
+        }
+
+        // Inform the user that something went wrong and deactivate the draw control
+        obj.context._showError(obj.context._drawControl);
+        obj.context._deactivateDraw();
+    },
+
     // Main function to make the actual call to the API and display the resultant isoline group on the map
     _callApi: function (latLng) {
         if (window.XMLHttpRequest) {
@@ -808,40 +832,25 @@ L.Control.Reachability = L.Control.extend({
                             context._map.fire('reachability:displayed');
                         }
                         else {
+                            // API returned data but no GeoJSON layers
                             context.latestIsolines = null;
 
-                            // Fire event to inform that no data was returned
-                            context._map.fire('reachability:no_data');
-
-                            // Log more specific details in the javascript console
-                            if (window.console && window.console.log) {
-                                window.console.log('Leaflet.reachability.js: API returned data but no GeoJSON layers. Details of response received below:');
-                                window.console.log('Status:', this.status);
-                                window.console.log('Headers:', this.getAllResponseHeaders());
-                                window.console.log(this.responseText);
-                            }
-
-                            // Inform the user that something went wrong and deactivate the draw control
-                            context._showError(context._drawControl);
-                            context._deactivateDraw();
+                            context._handleError({
+                                message: 'Leaflet.reachability.js: API returned data but no GeoJSON layers. Details of response received below:',
+                                requestResult: this,
+                                context: context,
+                                events: ['no_data']
+                            });
                         }
                     }
                     else {
-                        // Request failed for some reason, output response to console if possible
-                        if (window.console && window.console.log) {
-                            window.console.log('Leaflet.reachability.js error. Details of response received below:');
-                            window.console.log('Status:', this.status);
-                            window.console.log('Headers:', this.getAllResponseHeaders());
-                            window.console.log(this.responseText);
-                        }
-
-                        // Fire events to inform that there isn't any data
-                        context._map.fire('reachability:error');
-                        context._map.fire('reachability:no_data');
-
-                        // Inform the user that something went wrong and deactivate the draw control
-                        context._showError(context._drawControl);
-                        context._deactivateDraw();
+                        // Request failed for some reason
+                        context._handleError({
+                            message: 'Leaflet.reachability.js error. Details of response received below:',
+                            requestResult: this,
+                            context: context,
+                            events: ['error','no_data']
+                        });
                     }
 
                     // Whether successful or not, inform that we have completed calling the API - could be useful for stopping a spinner etc. to indicate to the user that something was happening.
@@ -862,16 +871,13 @@ L.Control.Reachability = L.Control.extend({
             request.send(requestBody);
         }
         else {
-            // Browser is not capable of making the request so fire error and no data events
-            context._map.fire('reachability:error');
-            context._map.fire('reachability:no_data');
-
-            // Inform the user that something went wrong and deactivate the draw control
-            context._showError(context._drawControl);
-            context._deactivateDraw();
-
-            // Log more specific details in the javascript console
-            if (window.console && window.console.log) window.console.log('Leaflet.reachability.js error. Browser does not support XMLHttpRequest so is not capable of making the request to the API');
+            // Browser is not capable of making the request so handle the error
+            this._handleError({
+                message: 'Leaflet.reachability.js error. Browser does not support XMLHttpRequest so is not capable of making the request to the API.',
+                requestResult: null,
+                context: this,
+                events: ['error','no_data']
+            });
         }
     }
 });
