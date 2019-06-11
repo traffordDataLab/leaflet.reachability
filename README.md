@@ -71,7 +71,7 @@ These are the general setup options for the plugin control e.g. where it appears
 
 The options below control the styling and content of the user interface as well as for choosing which reachability options should be selected by default.
 
-***NOTE: The maximum number of isochrones which can be requested at one time from the API is 10. Care should be taken choosing the maximum and interval values (or the custom range values) for the distance and time options. If the user selects the intervals checkbox it is possible that the maximum isochrone request number could be exceeded. Take the following distance (km) example: `rangeControlDistanceMax` = 1.1, `rangeControlDistanceInterval` = 0.1. The range select list would contain 11 items (0.1km - 1.1km). If the user selected 1.1km with intervals they would be requesting 11 isochrones which would result in an error.***
+***NOTE: The maximum number of isochrones which can be requested at one time from the API is 10. Care should be taken choosing the interval values (or the custom range values) for the distance and time options. If the user selects the intervals checkbox it is possible that the maximum isochrone request number could be exceeded. Take the following distance (km) example: `rangeControlDistanceMax` = 1.1, `rangeControlDistanceInterval` = 0.1. The range select list would contain 11 items (0.1km - 1.1km). If the user selected 1.1km with intervals they would be requesting 11 isochrones which would result in an error.***
 
 | Option                          | Type   | Default                                     | Description |
 | ------------------------------- | ------ | ------------------------------------------- | ----------- |
@@ -107,13 +107,13 @@ The options below control the styling and content of the user interface as well 
 | `travelModeDefault`             | String | `null`                                      | Sets the default travel profile. If this is not equal to one of the travel profile options (see openrouteservice API options below) it will use the value of `travelModeDrivingProfile` |
 | `rangeControlDistanceTitle`     | String | `"Dist."`                                   | Title displayed above the range select list when distance is selected as the reachability measure. |
 | `rangeControlDistanceUnits`     | String | `"km"`                                      | Units for the distance measure. Can be `"m"` (metres), `"km"` (kilometres) or `"mi"` (miles). Corresponds to `units` in the API documentation. |
-| `rangeControlDistance`          | Array  | `null`                                      | Custom range of distance values measured in `rangeControlDistanceUnits` specified as an array which supersedes `rangeControlDistanceMax` and `rangeControlDistanceInterval` if not null. |
+| `rangeControlDistance`          | Array  | `null`                                      | Custom range of distance values measured in `rangeControlDistanceUnits` specified as an array which supersedes `rangeControlDistanceMax` and `rangeControlDistanceInterval` if not null. See ***NOTE:*** above, maximum number of values is 10. |
 | `rangeControlDistanceMax`       | Number | `3`                                         | Maximum distance value to display in the range selection list, measured in `rangeControlDistanceUnits`. |
-| `rangeControlDistanceInterval`  | Number | `0.5`                                       | Distance intervals between 0 and the `rangeControlDistanceMax` value, measured in `rangeControlDistanceUnits`. Corresponds to `interval` in the API documentation. |
+| `rangeControlDistanceInterval`  | Number | `0.5`                                       | Distance intervals between 0 and the `rangeControlDistanceMax` value, measured in `rangeControlDistanceUnits`. Corresponds to `interval` in the API documentation. See ***NOTE:*** above regarding choosing appropriate values. |
 | `rangeControlTimeTitle`         | String | `"Time"`                                    | Title displayed above the range select list when time is selected as the reachability measure. |
-| `rangeControlTime`              | Array | `null`                                       | Custom range of time values measured in minutes but multipled by 60 to convert to seconds when passed to the API as this is the only unit of time allowed. specified as an array which supersedes `rangeControlTimeMax` and `rangeControlTimeInterval` if not null. |
+| `rangeControlTime`              | Array | `null`                                       | Custom range of time values measured in minutes but multipled by 60 to convert to seconds when passed to the API as this is the only unit of time allowed. specified as an array which supersedes `rangeControlTimeMax` and `rangeControlTimeInterval` if not null. See ***NOTE:*** above, maximum number of values is 10. |
 | `rangeControlTimeMax`           | Number | `30`                                        | Maximum time value to display in the range selection list, measured in minutes but multipled by 60 to convert to seconds when passed to the API as this is the only unit of time allowed. |
-| `rangeControlTimeInterval`      | Number | `5`                                         | Time intervals between 0 and `rangeControlTimeMax` value, measured in minutes but multipled by 60 to convert to seconds when passed to the API as this is the only unit of time allowed. Corresponds to `interval` in the API documentation. |
+| `rangeControlTimeInterval`      | Number | `5`                                         | Time intervals between 0 and `rangeControlTimeMax` value, measured in minutes but multipled by 60 to convert to seconds when passed to the API as this is the only unit of time allowed. Corresponds to `interval` in the API documentation. See ***NOTE:*** above regarding choosing appropriate values. |
 | `rangeIntervalsLabel`           | String | `"intervals"`                               | Text displayed next to the checkbox which controls whether reachability areas should be drawn for all intervals up to the value chosen by the user or just the chosen value. |
 
 **Reachability polygon options**
@@ -125,19 +125,19 @@ The options below give you control over the styling and interactive behaviour of
 | `clickFn`     | Function | `null`   | External function called when a click/touch event occurs on a reachability polygon. |
 | `mouseOutFn`  | Function | `null`   | External function called when a mouseout event occurs on a reachability polygon. |
 | `mouseOverFn` | Function | `null`   | External function called when a mouseover event occurs on a reachability polygon. |
-| `styleFn`     | Function | `null`   | External function to style the reachability polygon(s) returned from the API. |
+| `styleFn`     | Function | `null`   | External function to style the reachability polygon(s) returned from the API. See **example 2** below for reference. |
 
 **Reachability origin marker options**
 
-The following options allow you to decide if markers are created at the origin of the reachability polygons (i.e. the point chosen by the user on the map), and if so, give you control over their styling and interactive behaviour.
+The following options allow you to decide whether markers denoting the origin of the reachability polygons (i.e. the point chosen by the user on the map) should be displayed, and if so, give you control over their styling and interactive behaviour.
 
 | Option            | Type     | Default  | Description |
 | ----------------- | -------- | -------- | ----------- |
-| `showOriginMarker`| Boolean  | `true`   | Whether a marker is displayed at the origin of a reachability area or not. |
-| `markerFn`        | Function | `null`   | External function to create a custom marker at the origin of a reachability area if `showOriginMarker` is `true`. A value of `null` creates a default circleMarker. |
+| `showOriginMarker`| Boolean  | `true`   | Whether a marker at the origin of a reachability polygon is displayed or not. |
+| `markerFn`        | Function | `null`   | External function to create a custom marker at the origin of a reachability polygon if `showOriginMarker` is `true`. A value of `null` creates a default circleMarker. |
 | `markerClickFn`   | Function | `null`   | External function called when a click/touch event occurs on a reachability origin marker. |
-| `markerOutFn`     | Function | `null`   | External function called when a mouseout event occurs on a origin marker. |
-| `markerOverFn`    | Function | `null`   | External function called when a mouseover event occurs on a origin marker. |
+| `markerOutFn`     | Function | `null`   | External function called when a mouseout event occurs on an origin marker. |
+| `markerOverFn`    | Function | `null`   | External function called when a mouseover event occurs on an origin marker. |
 
 **Openrouteservice API interaction options**
 
@@ -146,7 +146,7 @@ Options presented below are for controlling the communication between the plugin
 | Option                           | Type             | Default             | Description |
 | -------------------------------- | ---------------- | ------------------- | ----------- |
 | `apiKey`                         | String           | `""`                | **REQUIRED!** Your openrouteservice API key. [Register for one here](https://openrouteservice.org/dev/#/signup). Corresponds to `api_key` in the API documentation. |
-| `attributes`                     | String (CSV)     | `'"area","reachfactor","total_pop"'` | Optional data returned from the API, you can choose all, none or a combination of the following. `area` gives the approximate area of the reachability polygon(s) measured in the square of the units chosen in the plugin option `rangeControlDistanceUnits`, e.g. "m^2", "km^2" or "mi^2". `reachfactor` is the ratio of a reachability polygon's area to the theoretically possible area reachable if there were no roads (i.e. as the crow flies). `total_pop` is an estimate of the number of people living in the area covered by the reachability polygon(s). This value is supplied in the openrouteservice API via [Global Human Settlement (GHS)](https://ghsl.jrc.ec.europa.eu/about.php) data. Corresponds to `attributes` in the API documentation. |
+| `attributes`                     | String (CSV)     | `'"area", "reachfactor", "total_pop"'` | Optional data returned from the API, you can choose all, none or a combination of the following. `area` gives the approximate area of the reachability polygon(s) measured in the square of the units chosen in the plugin option `rangeControlDistanceUnits`, e.g. "m^2", "km^2" or "mi^2". `reachfactor` is the ratio of a reachability polygon's area to the theoretically possible area reachable if there were no roads (i.e. as the crow flies). `total_pop` is an estimate of the number of people living in the area covered by the reachability polygon(s). This value is supplied in the openrouteservice API via [Global Human Settlement (GHS)](https://ghsl.jrc.ec.europa.eu/about.php) data. Corresponds to `attributes` in the API documentation. |
 | `smoothing`                      | number           | `0`                 | Applies a level of generalisation to the reachability polygons generated as a **smoothing_factor** between 0 and 100. The algorithm is **(maximum_radius_of_isochrone / 100) * smoothing_factor** with values closer to 100 resulting in more generalised shapes. Corresponds to `smoothing` in the API documentation. |
 | `travelModeAccessibilityProfile` | String           | `"wheelchair"`      | Accessibility travel profile. Used when the accessibility mode of travel button is selected. Possible values are `"wheelchair"`. Corresponds to `profile` in the API documentation. |
 | `travelModeCyclingProfile`       | String           | `"cycling-regular"` | Cycling travel profile. Used when the cycling mode of travel button is selected. Possible values are `"cycling-regular"`, `"cycling-road"`, `"cycling-safe"`, `"cycling-mountain"` and `"cycling-tour"`. Corresponds to `profile` in the API documentation. |
@@ -170,7 +170,7 @@ The following table lists all the events fired by the plugin via the map object.
 | `"reachability:delete"`             | [Event](http://leafletjs.com/reference.html#event) | Fired when a reachability area is deleted from the map. |
 | `"reachability:api_call_start"`     | [Event](http://leafletjs.com/reference.html#event) | Fired when a call to the openrouteservice API is started.  |
 | `"reachability:api_call_end"`       | [Event](http://leafletjs.com/reference.html#event) | Fired when a call to the openrouteservice API is ended. |
-| `"reachability:displayed"`          | [Event](http://leafletjs.com/reference.html#event) | Fired when reachability polygon(s) are displayed on the map following an openrouteservice API call. |
+| `"reachability:displayed"`          | [Event](http://leafletjs.com/reference.html#event) | Fired when reachability polygon(s) are displayed on the map following an openrouteservice API call. See **example 3** for reference. |
 | `"reachability:no_data"`            | [Event](http://leafletjs.com/reference.html#event) | Fired when the openrouteservice API returns no reachability areas following a call. |
 | `"reachability:error"`              | [Event](http://leafletjs.com/reference.html#event) | Fired when a call to the openrouteservice API cannot be made for some reason. |
 
@@ -233,19 +233,19 @@ Within the `properties` object of each reachability polygon are various key/valu
 }
 ```
 
-The table below describes the contents of the polygon properties object. NOTE: keys marked with an ***** are dependant on the values chosen in the `attributes` parameter (see above):
+The table below describes the contents of the polygon properties object. NOTE: keys marked with an * are dependant on the values chosen in the `attributes` parameter (see above):
 
 | Key                   | Type   | Description |
 |-----------------------|--------|-------------|
-| *****`"Area"`         | Number | Approximate area covered by the polygon, measured in `"Area units"`. For this key to be present, the `attributes` parameter must contain the string `"area"`. |
-| *****`"Area units"`   | String | Units for the `"Area"` value. This will be set to the square of the units of the plugin option `rangeControlDistanceUnits`, e.g. `"m^2"`, `"km^2"` or `"mi^2"`. For this key to be present, the `attributes` parameter must contain the string `"area"`. |
+| *`"Area"`         | Number | Approximate area covered by the polygon, measured in `"Area units"`. For this key to be present, the `attributes` parameter must contain the string `"area"`. |
+| *`"Area units"`   | String | Units for the `"Area"` value. This will be set to the square of the units of the plugin option `rangeControlDistanceUnits`, e.g. `"m^2"`, `"km^2"` or `"mi^2"`. For this key to be present, the `attributes` parameter must contain the string `"area"`. |
 | `"Latitude"`          | Number | Latitude of the point of origin for the reachability polygon. |
 | `"Longitude"`         | Number | Longitude of the point of origin for the reachability polygon. |
 | `"Measure"`           | String | Either `"time"` or `"distance"`. |
-| *****`"Population"`   | Number | Estimate of the number of people living in the area covered by the polygon. This value is supplied in the openrouteservice API via [Global Human Settlement (GHS)](https://ghsl.jrc.ec.europa.eu/about.php) data. |
+| *`"Population"`   | Number | Estimate of the number of people living in the area covered by the polygon. This value is supplied in the openrouteservice API via [Global Human Settlement (GHS)](https://ghsl.jrc.ec.europa.eu/about.php) data. |
 | `"Range"`             | Number | Range value of the reachability polygon measured in `"Range units"`. |
 | `"Range units"`       | String | If `"Measure"` is `"time"` this value will be `"min"` (minutes), otherwise it will be set to the units of the plugin option `rangeControlDistanceUnits`, e.g. `"m"`, `"km"` or `"mi"`.       |
-| *****`"Reach factor"` | Number | The ratio of a reachability polygon's area to the theoretically possible area reachable if there were no roads (i.e. as the crow flies). |
+| *`"Reach factor"` | Number | The ratio of a reachability polygon's area to the theoretically possible area reachable if there were no roads (i.e. as the crow flies). |
 | `"Travel mode"`       | String | The openrouteservice API mode of travel `profile` of the reachability polygon e.g. `"foot-walking"`, `"wheelchair"`, `"cycling-regular"`, `"driving-car"` etc. |
 
 These properties can be bound to a popup or displayed within a custom container when the user selects a reachability area etc.
