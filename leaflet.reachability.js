@@ -654,57 +654,57 @@ L.Control.Reachability = L.Control.extend({
         // Store the context for use within the API callback
         var context = this;
 
-        try {
-            if (window.XMLHttpRequest) {
-                // Start setting up the body of the request which contains most of the parameters
-                var requestBody = '{"locations":[[' + latLng.lng + ',' + latLng.lat + ']],"attributes":[' + this.options.attributes + '],"smoothing":' + this.options.smoothing + ',';
+        if (window.XMLHttpRequest) {
+            // Start setting up the body of the request which contains most of the parameters
+            var requestBody = '{"locations":[[' + latLng.lng + ',' + latLng.lat + ']],"attributes":[' + this.options.attributes + '],"smoothing":' + this.options.smoothing + ',';
 
-                // The next part of the request body depends on the options and values selected by the user
-                var arrRange = [];      // the array to hold either the single range value or multiple values if the intervals have been requested
-                var optionsIndex = 0;   // index of the range collection
+            // The next part of the request body depends on the options and values selected by the user
+            var arrRange = [];      // the array to hold either the single range value or multiple values if the intervals have been requested
+            var optionsIndex = 0;   // index of the range collection
 
-                if (this._rangeIsDistance) {
-                    if (this._showInterval.checked) {
-                        do {
-                            arrRange.push(this._rangeDistanceList[optionsIndex].value);
-                            optionsIndex++;
-                        }
-                        while (optionsIndex <= this._rangeDistanceList.selectedIndex);
+            if (this._rangeIsDistance) {
+                if (this._showInterval.checked) {
+                    do {
+                        arrRange.push(this._rangeDistanceList[optionsIndex].value);
+                        optionsIndex++;
                     }
-                    else {
-                        arrRange.push(this._rangeDistanceList.value);
-                    }
-
-                    requestBody += '"range_type":"distance","units":"' + this.options.rangeControlDistanceUnits + '"';
+                    while (optionsIndex <= this._rangeDistanceList.selectedIndex);
                 }
                 else {
-                    if (this._showInterval.checked) {
-                        do {
-                            arrRange.push(this._rangeTimeList[optionsIndex].value * 60);
-                            optionsIndex++;
-                        }
-                        while (optionsIndex <= this._rangeTimeList.selectedIndex);
-                    }
-                    else {
-                        arrRange.push(this._rangeTimeList.value * 60);
-                    }
-
-                    requestBody += '"range_type":"time"';
+                    arrRange.push(this._rangeDistanceList.value);
                 }
 
-                // The area units are the same no matter whether based on distance or time, and add the range to finished the request body
-                requestBody += ',"area_units":"' + this.options.rangeControlDistanceUnits + '","range":[' + arrRange.toString() + ']}';
+                requestBody += '"range_type":"distance","units":"' + this.options.rangeControlDistanceUnits + '"';
+            }
+            else {
+                if (this._showInterval.checked) {
+                    do {
+                        arrRange.push(this._rangeTimeList[optionsIndex].value * 60);
+                        optionsIndex++;
+                    }
+                    while (optionsIndex <= this._rangeTimeList.selectedIndex);
+                }
+                else {
+                    arrRange.push(this._rangeTimeList.value * 60);
+                }
 
-                // Setup the request object and associated items
-                var request = new XMLHttpRequest();
+                requestBody += '"range_type":"time"';
+            }
 
-                request.open('POST', 'https://api.openrouteservice.org/v2/isochrones/' + this._travelMode);
+            // The area units are the same no matter whether based on distance or time, and add the range to finished the request body
+            requestBody += ',"area_units":"' + this.options.rangeControlDistanceUnits + '","range":[' + arrRange.toString() + ']}';
 
-                request.setRequestHeader('Content-Type', 'application/geo+json; charset=utf-8');
-                request.setRequestHeader('Authorization', this.options.apiKey);
+            // Setup the request object and associated items
+            var request = new XMLHttpRequest();
 
-                // Setup the callback function to deal with the response from the API
-                request.onreadystatechange = function () {
+            request.open('POST', 'https://api.openrouteservice.org/v2/isochrones/' + this._travelMode);
+
+            request.setRequestHeader('Content-Type', 'application/geo+json; charset=utf-8');
+            request.setRequestHeader('Authorization', this.options.apiKey);
+
+            // Setup the callback function to deal with the response from the API
+            request.onreadystatechange = function () {
+                try {
                     // Wait until the operation has completed, either successfully or failed
                     if (this.readyState === 4) {
                         // Decide what to do based on the response status
@@ -854,7 +854,7 @@ L.Control.Reachability = L.Control.extend({
                         else {
                             // Request failed for some reason
                             context._handleError({
-                                message: 'Leaflet.reachability.js error. Details of response received below:',
+                                message: 'Leaflet.reachability.js error calling API, response was not successful. Details of response received below:',
                                 requestResult: this,
                                 context: context,
                                 events: ['error','no_data']
@@ -867,31 +867,31 @@ L.Control.Reachability = L.Control.extend({
                         // Get ready to register another draw request
                         context._drawRequestRegistered = false;
                     }
-                };
+                }
+                catch(e) {
+                    // Unexpected error
+                    context._handleError({
+                        message: 'Leaflet.reachability.js unexpected error attempting to call API. Details of the error below.\n' + e,
+                        requestResult: null,
+                        context: context,
+                        events: ['error','no_data','api_call_end']
+                    });
+                }
+            };
 
-                // Inform that we are calling the API - could be useful for starting a spinner etc. to indicate to the user that something is happening if there is a delay
-                this._map.fire('reachability:api_call_start');
+            // Inform that we are calling the API - could be useful for starting a spinner etc. to indicate to the user that something is happening if there is a delay
+            this._map.fire('reachability:api_call_start');
 
-                // Make the call to the API
-                request.send(requestBody);
-            }
-            else {
-                // Browser is not capable of making the request so handle the error
-                this._handleError({
-                    message: 'Leaflet.reachability.js error. Browser does not support XMLHttpRequest so is not capable of making the request to the API.',
-                    requestResult: null,
-                    context: this,
-                    events: ['error','no_data']
-                });
-            }
+            // Make the call to the API
+            request.send(requestBody);
         }
-        catch(e) {
-            // Unexpected error
-            context._handleError({
-                message: 'Leaflet.reachability.js error attempting to call API. Details of the error below.\n' + e,
+        else {
+            // Browser is not capable of making the request so handle the error
+            this._handleError({
+                message: 'Leaflet.reachability.js error. Browser does not support XMLHttpRequest so is not capable of making the request to the API.',
                 requestResult: null,
-                context: context,
-                events: ['error','no_data','api_call_end']
+                context: this,
+                events: ['error','no_data']
             });
         }
     }
