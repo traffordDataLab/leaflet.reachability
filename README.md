@@ -7,15 +7,13 @@ We have published an [article](https://medium.com/@traffordDataLab/out-of-reach-
 - [How many facilities are within a 15 minute walk?](https://vimeo.com/291529944)
 - [Finding a common location within reach](https://vimeo.com/292728150)
 
-## Documentation
-You will need to obtain a free API key from <a href="https://openrouteservice.org/dev/#/signup">openrouteservice</a> before using this plugin. Please do not use the key from the demo in your own applications.
+## Documentation (v2.0.0)
+You will need to obtain a free API key from <a href="https://openrouteservice.org/dev/#/signup">openrouteservice</a> before using this plugin. Please do not use the key from the demo in your own applications. Consult the [change log](changelog.md) to find out what has changed from previous versions.
 
 After including the CSS and JS in your page (NOTE - you can also use minified versions e.g. .min.js/.min.css if you prefer):...
 ```HTML
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/trafforddatalab/leaflet.reachability@v1.0.1/leaflet.reachability.css"/>
-<script src="https://cdn.jsdelivr.net/gh/trafforddatalab/leaflet.reachability@v1.0.1/leaflet.reachability.js"></script>
-<!-- Include below if you don't have your own preferred AJAX function/method (see options below) -->
-<script src="https://cdn.jsdelivr.net/gh/trafforddatalab/leaflet.reachability@v1.0.1/simple_ajax_request.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/trafforddatalab/leaflet.reachability@v2.0.0/leaflet.reachability.css"/>
+<script src="https://cdn.jsdelivr.net/gh/trafforddatalab/leaflet.reachability@v2.0.0/leaflet.reachability.js"></script>
 ```
 
 ...you can then initialise the plugin in the standard Leaflet way adding it to a map instance:
@@ -46,7 +44,7 @@ This is the minimum code required and will use all the default settings. If you 
 
 ### Options
 
-The plugin has many options, e.g. for controlling the appearance of the user-interface, (allowing icons from popular services such as [Font Awesome](https://fontawesome.com/) to be used), styling the reachability polygons and markers as well as incorporating many of the [openrouteservice API options](https://openrouteservice.org/documentation/#/reference/isochrones/isochrones/isochrones-service). Therefore the list of options in the tables below are presented in sections based on their use. The options within each section are listed in alphabetical order except when grouping related options or introducing certain options first makes more sense.
+The plugin has many options, e.g. for controlling the appearance of the user-interface, (allowing icons from popular services such as [Font Awesome](https://fontawesome.com/) to be used), styling the reachability polygons and markers as well as incorporating many of the [openrouteservice API options](https://openrouteservice.org/dev/#/api-docs/v2/isochrones/{profile}/post). Therefore the list of options in the tables below are presented in sections based on their use. The options within each section are listed in alphabetical order except when grouping related options or introducing certain options first makes more sense.
 
 **PLEASE NOTE:** *the options below contain entries for accessible travel mode. This feature is currently unavailable but will be implemented in a future release of the plugin.*
 
@@ -73,7 +71,7 @@ These are the general setup options for the plugin control e.g. where it appears
 
 The options below control the styling and content of the user interface as well as for choosing which reachability options should be selected by default.
 
-*NOTE: The maximum number of isochrones which can be requested at one time from the API is 10. Care should be taken with the values chosen for the minimum, maximum and interval values for the distance and time ranges. If the user selects the intervals checkbox it is possible that the maximum isochrone request number could be exceeded. Take the following distance (km) example: `rangeControlDistanceMin` = 0.5, `rangeControlDistanceMax` = 1.1, `rangeControlDistanceInterval` = 0.1. The range select list would contain 7 items (0.5km - 1.1km) but if the user selected 1.1km with intervals they would be requesting 11 isochrones (0 to 0.1km, 0.2km, 0.3km, 0.4km, 0.5km, 0.6km, 0.7km, 0.8km, 0.9km, 1km, 1.1km), which would result in an error.*
+***NOTE: The maximum number of isochrones which can be requested at one time from the API is 10. Care should be taken choosing the maximum and interval values (or the custom range values) for the distance and time options. If the user selects the intervals checkbox it is possible that the maximum isochrone request number could be exceeded. Take the following distance (km) example: `rangeControlDistanceMax` = 1.1, `rangeControlDistanceInterval` = 0.1. The range select list would contain 11 items (0.1km - 1.1km). If the user selected 1.1km with intervals they would be requesting 11 isochrones which would result in an error.***
 
 | Option                          | Type   | Default                                     | Description |
 | ------------------------------- | ------ | ------------------------------------------- | ----------- |
@@ -109,13 +107,13 @@ The options below control the styling and content of the user interface as well 
 | `travelModeDefault`             | String | `null`                                      | Sets the default travel profile. If this is not equal to one of the travel profile options (see openrouteservice API options below) it will use the value of `travelModeDrivingProfile` |
 | `rangeControlDistanceTitle`     | String | `"Dist."`                                   | Title displayed above the range select list when distance is selected as the reachability measure. |
 | `rangeControlDistanceUnits`     | String | `"km"`                                      | Units for the distance measure. Can be `"m"` (metres), `"km"` (kilometres) or `"mi"` (miles). Corresponds to `units` in the API documentation. |
-| `rangeControlDistanceMin`       | Number | `0.5`                                       | Minimum distance value to display in the range selection list, measured in `rangeControlDistanceUnits`. |
+| `rangeControlDistance`          | Array  | `null`                                      | Custom range of distance values measured in `rangeControlDistanceUnits` specified as an array which supersedes `rangeControlDistanceMax` and `rangeControlDistanceInterval` if not null. |
 | `rangeControlDistanceMax`       | Number | `3`                                         | Maximum distance value to display in the range selection list, measured in `rangeControlDistanceUnits`. |
-| `rangeControlDistanceInterval`  | Number | `0.5`                                       | Distance intervals between the `rangeControlDistanceMin` and `rangeControlDistanceMax` values, measured in `rangeControlDistanceUnits`. Corresponds to `interval` in the API documentation. |
+| `rangeControlDistanceInterval`  | Number | `0.5`                                       | Distance intervals between 0 and the `rangeControlDistanceMax` value, measured in `rangeControlDistanceUnits`. Corresponds to `interval` in the API documentation. |
 | `rangeControlTimeTitle`         | String | `"Time"`                                    | Title displayed above the range select list when time is selected as the reachability measure. |
-| `rangeControlTimeMin`           | Number | `5`                                         | Minimum time value to display in the range selection list, measured in minutes but multipled by 60 to convert to seconds when passed to the API as this is the only unit of time allowed. |
+| `rangeControlTime`              | Array | `null`                                       | Custom range of time values measured in minutes but multipled by 60 to convert to seconds when passed to the API as this is the only unit of time allowed. specified as an array which supersedes `rangeControlTimeMax` and `rangeControlTimeInterval` if not null. |
 | `rangeControlTimeMax`           | Number | `30`                                        | Maximum time value to display in the range selection list, measured in minutes but multipled by 60 to convert to seconds when passed to the API as this is the only unit of time allowed. |
-| `rangeControlTimeInterval`      | Number | `5`                                         | Time intervals between the `rangeControlTimeMin` and `rangeControlTimeMax` values, measured in minutes but multipled by 60 to convert to seconds when passed to the API as this is the only unit of time allowed. Corresponds to `interval` in the API documentation. |
+| `rangeControlTimeInterval`      | Number | `5`                                         | Time intervals between 0 and `rangeControlTimeMax` value, measured in minutes but multipled by 60 to convert to seconds when passed to the API as this is the only unit of time allowed. Corresponds to `interval` in the API documentation. |
 | `rangeIntervalsLabel`           | String | `"intervals"`                               | Text displayed next to the checkbox which controls whether reachability areas should be drawn for all intervals up to the value chosen by the user or just the chosen value. |
 
 **Reachability polygon options**
@@ -143,13 +141,14 @@ The following options allow you to decide if markers are created at the origin o
 
 **Openrouteservice API interaction options**
 
-Options presented below are for controlling the communication between the plugin and the openrouteservice API. Some correspond to the options found in the [API documentation](https://openrouteservice.org/documentation/#/reference/isochrones/isochrones/isochrones-service).
+Options presented below are for controlling the communication between the plugin and the openrouteservice API. Some correspond to the options found in the [API documentation](https://openrouteservice.org/dev/#/api-docs/v2/isochrones/{profile}/post).
 
 | Option                           | Type             | Default             | Description |
 | -------------------------------- | ---------------- | ------------------- | ----------- |
 | `apiKey`                         | String           | `""`                | **REQUIRED!** Your openrouteservice API key. [Register for one here](https://openrouteservice.org/dev/#/signup). Corresponds to `api_key` in the API documentation. |
-| `ajaxRequestFn`                  | Function         | `null`              | External function to make the actual call to the openrouteservice API. Can be any function capable of making AJAX requests, e.g. your own custom JavaScript/JQuery function etc. A value of `null` will attempt to use the basic function found in `simple_ajax_request.js` bundled with the plugin, so be sure to include this script along with the plugin in your application if you do not change this option. |
-| `travelModeAccessibilityProfile` | String           | `"wheelchair"`      | Accessibility travel profile. Used when the accessibility mode of travel button is selected. Possible values are `"wheelchair"`. Corresponds to `profile` in the API documentation |
+| `attributes`                     | String (CSV)     | `'"area","reachfactor","total_pop"'` | Optional data returned from the API, you can choose all, none or a combination of the following. `area` gives the approximate area of the reachability polygon(s) measured in the square of the units chosen in the plugin option `rangeControlDistanceUnits`, e.g. "m^2", "km^2" or "mi^2". `reachfactor` is the ratio of a reachability polygon's area to the theoretically possible area reachable if there were no roads (i.e. as the crow flies). `total_pop` is an estimate of the number of people living in the area covered by the reachability polygon(s). This value is supplied in the openrouteservice API via [Global Human Settlement (GHS)](https://ghsl.jrc.ec.europa.eu/about.php) data. Corresponds to `attributes` in the API documentation. |
+| `smoothing`                      | number           | `0`                 | Applies a level of generalisation to the reachability polygons generated as a **smoothing_factor** between 0 and 100. The algorithm is **(maximum_radius_of_isochrone / 100) * smoothing_factor** with values closer to 100 resulting in more generalised shapes. Corresponds to `smoothing` in the API documentation. |
+| `travelModeAccessibilityProfile` | String           | `"wheelchair"`      | Accessibility travel profile. Used when the accessibility mode of travel button is selected. Possible values are `"wheelchair"`. Corresponds to `profile` in the API documentation. |
 | `travelModeCyclingProfile`       | String           | `"cycling-regular"` | Cycling travel profile. Used when the cycling mode of travel button is selected. Possible values are `"cycling-regular"`, `"cycling-road"`, `"cycling-safe"`, `"cycling-mountain"` and `"cycling-tour"`. Corresponds to `profile` in the API documentation. |
 | `travelModeDrivingProfile`       | String           | `"driving-car"`     | Driving travel profile. Used when the driving mode of travel button is selected. Possible values are `"driving-car"` and `"driving-hgv"`. Corresponds to `profile` in the API documentation. |
 | `travelModeWalkingProfile`       | String           | `"foot-walking"`    | Walking travel profile. Used when the walking mode of travel button is selected. Possible values are `"foot-walking"` and `"foot-hiking"`. Corresponds to `profile` in the API documentation. |
@@ -193,9 +192,9 @@ reachabilityControl.isolinesGroup;
 reachabilityControl.latestIsolines;
 ```
 
-Both objects are types of the Leaflet [L.geoJSON layer](http://leafletjs.com/reference.html#geojson) object. The object `isolinesGroup` contains all the sets of reachability area polygons (and origin markers if `showOriginMarker` is `true`) that are currently drawn on the map. As the name suggests, `latestIsolines` contains the latest reachability areas returned from the most recent call to the API. If the user chooses to show the intervals between the minimum time or distance up to the value they have selected in the range select list, `latestIsolines` will contain a group of polygons, whereas if the intervals box is not checked it will only contain a single polygon. Important to also bear in mind, unless the `showOriginMarker` option is set to `false`, the `latestIsolines` group will also contain an additional feature for the origin marker.
+Both objects are types of the Leaflet [L.geoJSON layer](http://leafletjs.com/reference.html#geojson) object. The object `isolinesGroup` contains all the sets of reachability area polygons (and origin markers if `showOriginMarker` is `true`) that are currently drawn on the map. As the name suggests, `latestIsolines` contains the latest reachability areas returned from the most recent call to the API. If the user chooses to show the intervals between 0 and the value they have selected in the distance or time range select list, `latestIsolines` will contain a group of polygons, whereas if the intervals box is not checked it will only contain a single polygon. Important to also bear in mind, unless the `showOriginMarker` option is set to `false`, the `latestIsolines` group will also contain an additional feature for the origin marker.
 
-Within the `properties` object of each reachability polygon are various key/value pairs of data about the polygon, as shown in the example output below for a single reachability area created with an origin marker:
+Within the `properties` object of each reachability polygon are various key/value pairs of data about the polygon, as shown in the example output below for a single reachability area created with an origin marker. *(Please note that the order of the key/value pairs cannot be guaranteed and may be different from those shown below. The presence of `"Area"`, `"Area units"`, `"Population"` and `"Reach factor"` are dependent on the value of the `attributes` parameter.)*:
 
 ```JavaScript
 {
@@ -210,15 +209,16 @@ Within the `properties` object of each reachability polygon are various key/valu
                 ]
             },
             "properties":{
-                "Travel mode":"cycling-regular",
-                "Measure":"time",
-                "Range units":"min",
-                "Range":10,
                 "Area":15.41,
                 "Area units":"km^2",
                 "Latitude":53.423855,
                 "Longitude":-2.332535,
-                "Population":62534
+                "Measure":"time",
+                "Population":62534,
+                "Range":10,
+                "Range units":"min",
+                "Reach factor":0.1978,
+                "Travel mode":"cycling-regular"
             }
         },
         {
@@ -233,25 +233,26 @@ Within the `properties` object of each reachability polygon are various key/valu
 }
 ```
 
-The table below describes the contents of the polygon properties object:
+The table below describes the contents of the polygon properties object. NOTE: keys marked with an ***** are dependant on the values chosen in the `attributes` parameter (see above):
 
-| Key             | Type   | Description |
-|-----------------|--------|-------------|
-| `"Area"`        | Number | Approximate area covered by the polygon, measured in `"Area units"`. |
-| `"Area units"`  | String | Units for the `"Area"` value. This will be set to the square of the units of the plugin option `rangeControlDistanceUnits`, e.g. `"m^2"`, `"km^2"` or `"mi^2"`. |
-| `"Latitude"`    | Number | Latitude of the point of origin for the reachability polygon. |
-| `"Longitude"`   | Number | Longitude of the point of origin for the reachability polygon. |
-| `"Measure"`     | String | Either `"time"` or `"distance"`. |
-| `"Population"`  | Number | Estimate of the number of people living in the area covered by the polygon. This value is supplied in the openrouteservice API via [Global Human Settlement (GHS)](https://ghsl.jrc.ec.europa.eu/about.php) data. |
-| `"Range"`       | Number | Range value of the reachability polygon measured in `"Range units"`. |
-| `"Range units"` | String | If `"Measure"` is `"time"` this value will be `"min"` (minutes), otherwise it will be set to the units of the plugin option `rangeControlDistanceUnits`, e.g. `"m"`, `"km"` or `"mi"`. |
-| `"Travel mode"` | String | The openrouteservice API mode of travel `profile` of the polygon. |
+| Key                   | Type   | Description |
+|-----------------------|--------|-------------|
+| *****`"Area"`         | Number | Approximate area covered by the polygon, measured in `"Area units"`. For this key to be present, the `attributes` parameter must contain the string `"area"`. |
+| *****`"Area units"`   | String | Units for the `"Area"` value. This will be set to the square of the units of the plugin option `rangeControlDistanceUnits`, e.g. `"m^2"`, `"km^2"` or `"mi^2"`. For this key to be present, the `attributes` parameter must contain the string `"area"`. |
+| `"Latitude"`          | Number | Latitude of the point of origin for the reachability polygon. |
+| `"Longitude"`         | Number | Longitude of the point of origin for the reachability polygon. |
+| `"Measure"`           | String | Either `"time"` or `"distance"`. |
+| *****`"Population"`   | Number | Estimate of the number of people living in the area covered by the polygon. This value is supplied in the openrouteservice API via [Global Human Settlement (GHS)](https://ghsl.jrc.ec.europa.eu/about.php) data. |
+| `"Range"`             | Number | Range value of the reachability polygon measured in `"Range units"`. |
+| `"Range units"`       | String | If `"Measure"` is `"time"` this value will be `"min"` (minutes), otherwise it will be set to the units of the plugin option `rangeControlDistanceUnits`, e.g. `"m"`, `"km"` or `"mi"`.       |
+| *****`"Reach factor"` | Number | The ratio of a reachability polygon's area to the theoretically possible area reachable if there were no roads (i.e. as the crow flies). |
+| `"Travel mode"`       | String | The openrouteservice API mode of travel `profile` of the reachability polygon e.g. `"foot-walking"`, `"wheelchair"`, `"cycling-regular"`, `"driving-car"` etc. |
 
 These properties can be bound to a popup or displayed within a custom container when the user selects a reachability area etc.
 
 **Version**
 
-If the plugin was initialised with an object called `reachabilityControl`, you can obtain the version number using `reachabilityControl.version`. This will return a string in the [Semantic Versioning](https://semver.org/spec/v2.0.0.html) format `"MAJOR.MINOR.PATCH"` e.g. `"1.0.1"`.
+If the plugin was initialised with an object called `reachabilityControl`, you can obtain the version number using `reachabilityControl.version`. This will return a string in the [Semantic Versioning](https://semver.org/spec/v2.0.0.html) format `"MAJOR.MINOR.PATCH"` e.g. `"2.0.0"`.
 
 ### Examples
 

@@ -1,7 +1,7 @@
 /*
     Created:        2018/06/12 by James Austin - Trafford Data Lab
     Purpose:        Uses openrouteservice API to create isolines showing areas within reach of certain travel times based on different modes of travel or distance. See https://wiki.openstreetmap.org/wiki/Isochrone for more information
-    Dependencies:   Leaflet.js (external library), openrouteservice.org API (requires a key - free service available via registration), some AJAX function (either custom or simple_ajax_request.js)
+    Dependencies:   Leaflet.js (external library), openrouteservice.org API (requires a key - free service available via registration)
     Licence:        https://github.com/traffordDataLab/leaflet.reachability/blob/master/LICENSE
     Notes:          Can be displayed in a collapsed or expanded state. Content for all GUI elements can be html or an icon etc.
                     © Powered by openrouteservice https://openrouteservice.org/
@@ -92,7 +92,8 @@ L.Control.Reachability = L.Control.extend({
         travelModeWalkingProfile: 'foot-walking',       // API choices are 'foot-walking' and 'foot-hiking'
         travelModeAccessibilityProfile: 'wheelchair',   // API choices are 'wheelchair'
         travelModeDefault: null,                        // Set travel mode default - if this is not equal to one of the 4 profiles above it is set to the value of travelModeDrivingProfile in the onAdd function
-        smoothing: 0,                                   // Determines the level of generalisation applied to the isochrone polygons. Closer to 1 results in a more generalised shape
+        smoothing: 0,                                   // Determines the level of generalisation applied to the isochrone polygons. Closer to 100 results in a more generalised shape
+        attributes: '"area","reachfactor","total_pop"', // Optional data returned from the API: area of the isoline(s), ratio of the area of an isochrone to the theoretical area based on ecludian distance, estimated population living within the area of an isoline
 
         // Isoline styling and interaction
         styleFn: null,                                  // External function to call which styles the isolines returned from API call
@@ -199,7 +200,6 @@ L.Control.Reachability = L.Control.extend({
         // *** NOTE: TEMPORARY LINE BELOW AS THE WHEELCHAIR PROFILE IS STILL PRODUCING UNEXPECTED RESULTS. NEED TO MAKE ENQUIRIES ***
         L.DomUtil.addClass(this._accessibilityControl, 'reachability-control-hide-content');
         // ***************************************************************************************
-
 
 
         // Distance range title
@@ -657,7 +657,7 @@ L.Control.Reachability = L.Control.extend({
         try {
             if (window.XMLHttpRequest) {
                 // Start setting up the body of the request which contains most of the parameters
-                var requestBody = '{"locations":[[' + latLng.lng + ',' + latLng.lat + ']],"attributes":["area","total_pop"],"smoothing":' + this.options.smoothing + ',';
+                var requestBody = '{"locations":[[' + latLng.lng + ',' + latLng.lat + ']],"attributes":[' + this.options.attributes + '],"smoothing":' + this.options.smoothing + ',';
 
                 // The next part of the request body depends on the options and values selected by the user
                 var arrRange = [];      // the array to hold either the single range value or multiple values if the intervals have been requested
@@ -723,13 +723,12 @@ L.Control.Reachability = L.Control.extend({
                                         area:           the area of the isochrone, based on square units of the chosen distance unit
                                         value:          either metres or seconds depending if based on distance or time. Seems to ignore the distance unit
                                         total_pop:      integer value of people living in the area as given by Global Human Settlement (GHS) framework
-                                        reachfactor:    value between 0 (not very reachable) and 1 (easily reachable)
+                                        reachfactor:    value between 0 and 1 representing the ratio of the area of an isochrone to the theoretical area based on ecludian distance
                                 */
                                 for (var i = 0; i < data.features.length; i++) {
 
                                     var props = data.features[i].properties;    // get the properties for the current feature
-                                    var area = props.area,
-                                        range = props.value,
+                                    var range = props.value,
                                         rangeType,
                                         rangeUnits,
                                         rangeControlDistanceUnits = (context.options.rangeControlDistanceUnits == 'mi') ? 'miles' : context.options.rangeControlDistanceUnits;
@@ -756,14 +755,19 @@ L.Control.Reachability = L.Control.extend({
                                     var newProps = {
                                         'Travel mode': context._travelMode,
                                         'Measure': rangeType,
-                                        'Range units': rangeUnits,
                                         'Range': L.Util.formatNum(range, 2),
-                                        'Area': L.Util.formatNum(area, 2),
-                                        'Area units': rangeControlDistanceUnits + '^2',
+                                        'Range units': rangeUnits,
                                         'Latitude': props.center[1],
-                                        'Longitude': props.center[0],
-                                        'Population': props.total_pop
+                                        'Longitude': props.center[0]
                                     }
+
+                                    if (props.hasOwnProperty('area')) {
+                                        newProps['Area'] = L.Util.formatNum(props.area, 2);
+                                        newProps['Area units'] = rangeControlDistanceUnits + '^2';
+                                    }
+
+                                    if (props.hasOwnProperty('total_pop')) newProps['Population'] = props.total_pop;
+                                    if (props.hasOwnProperty('reachfactor')) newProps['Reach factor'] = props.reachfactor;
 
                                     // Replace the old properties object with the new one
                                     data.features[i].properties = newProps;
