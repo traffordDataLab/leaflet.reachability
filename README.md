@@ -1,5 +1,5 @@
 # leaflet.reachability
-[Trafford Data Lab](https://www.trafforddatalab.io) plugin for the [Leaflet](https://leafletjs.com) JavaScript library to show areas of reachability based on time or distance for different modes of travel using the [openrouteservice isochrones API](https://openrouteservice.org/documentation/#/reference/isochrones).
+[Trafford Data Lab](https://www.trafforddatalab.io) plugin for the [Leaflet](https://leafletjs.com) JavaScript library to show areas of reachability based on time or distance for different modes of travel using the [openrouteservice isochrones API](https://openrouteservice.org/dev/#/api-docs/v2/isochrones/{profile}/post).
 
 You can [view the demo](https://www.trafforddatalab.io/leaflet.reachability/leaflet.reachability_example.html) to get an idea of what it can do, or view a more customised implementation (which uses more of the available styling options) in our [Explore mapping application](https://www.trafforddatalab.io/explore/).
 
@@ -46,8 +46,6 @@ This is the minimum code required and will use all the default settings. If you 
 
 The plugin has many options, e.g. for controlling the appearance of the user-interface, (allowing icons from popular services such as [Font Awesome](https://fontawesome.com/) to be used), styling the reachability polygons and markers as well as incorporating many of the [openrouteservice API options](https://openrouteservice.org/dev/#/api-docs/v2/isochrones/{profile}/post). Therefore the list of options in the tables below are presented in sections based on their use. The options within each section are listed in alphabetical order except when grouping related options or introducing certain options first makes more sense.
 
-**PLEASE NOTE:** *the options below contain entries for accessible travel mode. This feature is currently unavailable but will be implemented in a future release of the plugin.*
-
 **Main options**
 
 These are the general setup options for the plugin control e.g. where it appears on the map, whether it is permanently expanded or if it can be toggled between collapsed and expanded states etc.
@@ -79,32 +77,32 @@ The options below control the styling and content of the user interface as well 
 | `settingsButtonStyleClass`      | String | `"reachability-control-settings-button"`    | Generic class to style the setting buttons uniformly - further customisation per button is available with specific options below. |
 | `activeStyleClass`              | String | `"reachability-control-active"`             | Indicates to the user which button is active in the settings panel and to show that the control is active if the draw or delete options are selected and the control is in its collapsed state. |
 | `errorStyleClass`               | String | `"reachability-control-error"`              | Gives feedback to the user via the buttons in the user interface that something went wrong, e.g. selecting delete when there are no reachability polgons on the map etc. |
-| `drawButtonContent`             | String | `"Drw"`                                     | HTML content of the button which activates and deactivates the control's draw mode. You can use an icon from various icon services instead by passing `""` for this value and adding the required classes to the the `drawButtonStyleClass` option. |
+| `drawButtonContent`             | String | `"drw"`                                     | HTML content of the button which activates and deactivates the control's draw mode. You can use an icon from various icon services instead by passing `""` for this value and adding the required classes to the the `drawButtonStyleClass` option. |
 | `drawButtonStyleClass`          | String | `""`                                        | CSS class(es) to control the styling/content of the draw button. |
 | `drawButtonTooltip`             | String | `"Draw reachability"`                       | Tooltip to appear on-hover over the draw button. |
-| `deleteButtonContent`           | String | `"Del"`                                     | HTML content of the button which activates and deactivates the control's delete mode. You can use an icon from various icon services instead by passing `""` for this value and adding the required classes to the the `deleteButtonStyleClass` option. |
+| `deleteButtonContent`           | String | `"del"`                                     | HTML content of the button which activates and deactivates the control's delete mode. You can use an icon from various icon services instead by passing `""` for this value and adding the required classes to the the `deleteButtonStyleClass` option. |
 | `deleteButtonStyleClass`        | String | `""`                                        | CSS class(es) to control the styling/content of the delete button. |
 | `deleteButtonTooltip`           | String | `"Delete reachability"`                     | Tooltip to appear on-hover over the delete button. |
-| `distanceButtonContent`         | String | `"Dst"`                                     | HTML content of the button to select distance as the reachability measure. You can use an icon from various icon services instead by passing `""` for this value and adding the required classes to the `distanceButtonStyleClass` option. |
+| `distanceButtonContent`         | String | `"dst"`                                     | HTML content of the button to select distance as the reachability measure. You can use an icon from various icon services instead by passing `""` for this value and adding the required classes to the `distanceButtonStyleClass` option. |
 | `distanceButtonStyleClass`      | String | `""`                                        | CSS class(es) to control the styling/content of the distance button. |
 | `distanceButtonTooltip`         | String | `"Reachability based on distance"`          | Tooltip to appear on-hover over the distance button. |
-| `timeButtonContent`             | String | `"Tme"`                                     | HTML content of the button to select time as the reachability measure. You can use an icon from various icon services instead by passing `""` for this value and adding the required classes to the `timeButtonStyleClass` option. |
+| `timeButtonContent`             | String | `"tme"`                                     | HTML content of the button to select time as the reachability measure. You can use an icon from various icon services instead by passing `""` for this value and adding the required classes to the `timeButtonStyleClass` option. |
 | `timeButtonStyleClass`          | String | `""`                                        | CSS class(es) to control the styling/content of the time button. |
 | `timeButtonTooltip`             | String | `"Reachability based on time"`              | Tooltip to appear on-hover over the time button. |
 | `rangeTypeDefault`              | String | `"time"`                                    | Selects whether distance or time is selected by default as the reachability measure. Any value other than `"distance"` passed to the API is assumed to be `"time"`. Corresponds to `range_type` in the API documentation. |
-| `drivingButtonContent`          | String | `"Drv"`                                     | HTML content of the driving travel mode button. You can use an icon from various icon services instead by passing `""` for this value and adding the required classes to the `drivingButtonStyleClass` option. |
-| `drivingButtonStyleClass`       | String | `""`                                        | CSS class(es) to control the styling/content of the driving travel mode button. |
-| `drivingButtonTooltip`          | String | `"Travel mode: driving"`                    | Tooltip to appear on-hover over the driving travel mode button. |
-| `cyclingButtonContent`          | String | `"Cyc"`                                     | HTML content of the cycling travel mode button. You can use an icon from various icon services instead by passing `""` for this value and adding the required classes to the `cyclingButtonStyleClass` option. |
-| `cyclingButtonStyleClass`       | String | `""`                                        | CSS class(es) to control the styling/content of the cycling travel mode button. |
-| `cyclingButtonTooltip`          | String | `"Travel mode: cycling"`                    | Tooltip to appear on-hover over the cycling travel mode button. |
-| `walkingButtonContent`          | String | `"Wlk"`                                     | HTML content of the walking travel mode button. You can use an icon from various icon services instead by passing `""` for this value and adding the required classes to the `walkingButtonStyleClass` option. |
-| `walkingButtonStyleClass`       | String | `""`                                        | CSS class(es) to control the styling/content of the walking travel mode button. |
-| `walkingButtonTooltip`          | String | `"Travel mode: walking"`                    | Tooltip to appear on-hover over the walking travel mode button. |
-| `accessibilityButtonContent`    | String | `"Acc"`                                     | HTML content of the accessibility travel mode button. You can use an icon from various icon services instead by passing `""` for this value and adding the required classes to the `accessibilityButtonStyleClass` option. |
-| `accessibilityButtonStyleClass` | String | `""`                                        | CSS class(es) to control the styling/content of the accessibility travel mode button. |
-| `accessibilityButtonTooltip`    | String | `"Travel mode: wheelchair"`                 | Tooltip to appear on-hover over the accessibility travel mode button. |
-| `travelModeDefault`             | String | `null`                                      | Sets the default travel profile. If this is not equal to one of the travel profile options (see openrouteservice API options below) it will use the value of `travelModeDrivingProfile` |
+| `travelModeButton1Content`      | String | `"car"`                                     | HTML content of the first travel mode button. You can use an icon from various icon services instead by passing `""` for this value and adding the required classes to the `travelModeButton1StyleClass` option. |
+| `travelModeButton1StyleClass`   | String | `""`                                        | CSS class(es) to control the styling/content of the first travel mode button. |
+| `travelModeButton1Tooltip`      | String | `"Travel mode: car"`                        | Tooltip to appear on-hover over the first travel mode button. |
+| `travelModeButton2Content`      | String | `"cyc"`                                     | HTML content of the second travel mode button. You can use an icon from various icon services instead by passing `""` for this value and adding the required classes to the `travelModeButton2StyleClass` option. |
+| `travelModeButton2StyleClass`   | String | `""`                                        | CSS class(es) to control the styling/content of the second travel mode button. |
+| `travelModeButton2Tooltip`      | String | `"Travel mode: cycling"`                    | Tooltip to appear on-hover over the second travel mode button. |
+| `travelModeButton3Content`      | String | `"wlk"`                                     | HTML content of the third travel mode button. You can use an icon from various icon services instead by passing `""` for this value and adding the required classes to the `travelModeButton3StyleClass` option. |
+| `travelModeButton3StyleClass`   | String | `""`                                        | CSS class(es) to control the styling/content of the third travel mode button. |
+| `travelModeButton3Tooltip`      | String | `"Travel mode: walking"`                    | Tooltip to appear on-hover over the third travel mode button. |
+| `travelModeButton4Content`      | String | `"wch"`                                     | HTML content of the fourth travel mode button. You can use an icon from various icon services instead by passing `""` for this value and adding the required classes to the `travelModeButton4StyleClass` option. |
+| `travelModeButton4StyleClass`   | String | `""`                                        | CSS class(es) to control the styling/content of the fourth travel mode button. |
+| `travelModeButton4Tooltip`      | String | `"Travel mode: wheelchair"`                 | Tooltip to appear on-hover over the fourth travel mode button. |
+| `travelModeDefault`             | String | `null`                                      | Sets the default travel profile. If this is not equal to one of the travel profile options (see openrouteservice API options below) it will use the value of `travelMode1Profile` |
 | `rangeControlDistanceTitle`     | String | `"Dist."`                                   | Title displayed above the range select list when distance is selected as the reachability measure. |
 | `rangeControlDistanceUnits`     | String | `"km"`                                      | Units for the distance measure. Can be `"m"` (metres), `"km"` (kilometres) or `"mi"` (miles). Corresponds to `units` in the API documentation. |
 | `rangeControlDistance`          | Array  | `null`                                      | Custom range of distance values measured in `rangeControlDistanceUnits` specified as an array which supersedes `rangeControlDistanceMax` and `rangeControlDistanceInterval` if not null. See ***NOTE:*** above, maximum number of values is 10. |
@@ -148,10 +146,10 @@ Options presented below are for controlling the communication between the plugin
 | `apiKey`                         | String           | `""`                | **REQUIRED!** Your openrouteservice API key. [Register for one here](https://openrouteservice.org/dev/#/signup). Corresponds to `api_key` in the API documentation. |
 | `attributes`                     | String (CSV)     | `'"area", "reachfactor", "total_pop"'` | Optional data returned from the API, you can choose all, none or a combination of the following. `area` gives the approximate area of the reachability polygon(s) measured in the square of the units chosen in the plugin option `rangeControlDistanceUnits`, e.g. "m^2", "km^2" or "mi^2". `reachfactor` is the ratio of a reachability polygon's area to the theoretically possible area reachable if there were no roads (i.e. as the crow flies). `total_pop` is an estimate of the number of people living in the area covered by the reachability polygon(s). This value is supplied in the openrouteservice API via [Global Human Settlement (GHS)](https://ghsl.jrc.ec.europa.eu/about.php) data. Corresponds to `attributes` in the API documentation. |
 | `smoothing`                      | number           | `0`                 | Applies a level of generalisation to the reachability polygons generated as a **smoothing_factor** between 0 and 100. The algorithm is **(maximum_radius_of_isochrone / 100) * smoothing_factor** with values closer to 100 resulting in more generalised shapes. Corresponds to `smoothing` in the API documentation. |
-| `travelModeAccessibilityProfile` | String           | `"wheelchair"`      | Accessibility travel profile. Used when the accessibility mode of travel button is selected. Possible values are `"wheelchair"`. Corresponds to `profile` in the API documentation. |
-| `travelModeCyclingProfile`       | String           | `"cycling-regular"` | Cycling travel profile. Used when the cycling mode of travel button is selected. Possible values are `"cycling-regular"`, `"cycling-road"`, `"cycling-safe"`, `"cycling-mountain"` and `"cycling-tour"`. Corresponds to `profile` in the API documentation. |
-| `travelModeDrivingProfile`       | String           | `"driving-car"`     | Driving travel profile. Used when the driving mode of travel button is selected. Possible values are `"driving-car"` and `"driving-hgv"`. Corresponds to `profile` in the API documentation. |
-| `travelModeWalkingProfile`       | String           | `"foot-walking"`    | Walking travel profile. Used when the walking mode of travel button is selected. Possible values are `"foot-walking"` and `"foot-hiking"`. Corresponds to `profile` in the API documentation. |
+| `travelModeProfile1`             | String           | `"driving-car"`     | Travel profile used when the first travel mode button is selected. Possible values are `"driving-car"`, `"driving-hgv"`, `"cycling-regular"`, `"cycling-road"`, `"cycling-mountain"`, `"cycling-electric"`, `"foot-walking"`, `"foot-hiking"` and `"wheelchair"`. Corresponds to `profile` in the API documentation. |
+| `travelModeProfile2`             | String           | `"cycling-regular"` | Travel profile used when the second travel mode button is selected. Possible values are `"driving-car"`, `"driving-hgv"`, `"cycling-regular"`, `"cycling-road"`, `"cycling-mountain"`, `"cycling-electric"`, `"foot-walking"`, `"foot-hiking"`, `"wheelchair"` and `null`. If the value is `null` the second travel mode button won't be displayed. Corresponds to `profile` in the API documentation. |
+| `travelModeProfile3`             | String           | `"foot-walking"`     | Travel profile used when the third travel mode button is selected. Possible values are `"driving-car"`, `"driving-hgv"`, `"cycling-regular"`, `"cycling-road"`, `"cycling-mountain"`, `"cycling-electric"`, `"foot-walking"`, `"foot-hiking"`, `"wheelchair"` and `null`. If the value is `null` the third travel mode button won't be displayed. Corresponds to `profile` in the API documentation. |
+| `travelModeProfile4`             | String           | `"wheelchair"`       | Travel profile used when the fourth travel mode button is selected. Possible values are `"driving-car"`, `"driving-hgv"`, `"cycling-regular"`, `"cycling-road"`, `"cycling-mountain"`, `"cycling-electric"`, `"foot-walking"`, `"foot-hiking"`, `"wheelchair"` and `null`. If the value is `null` the fourth travel mode button won't be displayed. Corresponds to `profile` in the API documentation. |
 
 ### Events
 
@@ -194,7 +192,7 @@ reachabilityControl.latestIsolines;
 
 Both objects are types of the Leaflet [L.geoJSON layer](http://leafletjs.com/reference.html#geojson) object. The object `isolinesGroup` contains all the sets of reachability area polygons (and origin markers if `showOriginMarker` is `true`) that are currently drawn on the map. As the name suggests, `latestIsolines` contains the latest reachability areas returned from the most recent call to the API. If the user chooses to show the intervals between 0 and the value they have selected in the distance or time range select list, `latestIsolines` will contain a group of polygons, whereas if the intervals box is not checked it will only contain a single polygon. Important to also bear in mind, unless the `showOriginMarker` option is set to `false`, the `latestIsolines` group will also contain an additional feature for the origin marker.
 
-Within the `properties` object of each reachability polygon are various key/value pairs of data about the polygon, as shown in the example output below for a single reachability area created with an origin marker. *(Please note that the order of the key/value pairs cannot be guaranteed and may be different from those shown below. The presence of `"Area"`, `"Area units"`, `"Population"` and `"Reach factor"` are dependent on the value of the `attributes` parameter.)*:
+Within the `properties` object of each reachability polygon are various key/value pairs of data about the polygon, as shown in the example output below for a single reachability area created with an origin marker. *(Please note that the order of the key/value pairs cannot be guaranteed and may be different from those shown below. The presence of `"Area"`, `"Area units"`, `"Population"` and `"Reach factor"` are dependent on the value of the `attributes` parameter - see above.)*:
 
 ```JavaScript
 {
@@ -385,6 +383,41 @@ map.on('reachability:displayed', function (e) {
 L.control.reachability({
     // add settings/options here
     apiKey: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+}).addTo(map);
+```
+
+**Example 4: Customising the travel mode buttons**
+
+The following example demonstrates how to customise the travel mode buttons for your usage requirements, in this instance to compare the difference in reachability between cycling on a road bike compared to a mountain bike.
+
+This example again uses [Font Awesome 4.7.0 icons](https://fontawesome.com/v4.7.0/icons/) but you can apply the same principle to other versions or icon libraries.
+
+First include the icon library file:
+
+```HTML
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"/>
+```
+
+Then specify the options within the code to initialise the plugin.
+
+```javascript
+// Create the Leaflet map object
+var map = L.map('map', { center: [53.4189, -2.33] });
+
+// Initialise the reachability plugin
+L.control.reachability({
+    // add settings/options here
+    apiKey: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+    travelModeButton1Content: '',
+    travelModeButton1StyleClass: 'fa fa-bicycle',
+    travelModeButton1Tooltip: 'Road bike',
+    travelModeProfile1: 'cycling-road',
+    travelModeButton2Content: '',
+    travelModeButton2StyleClass: 'fa fa-bicycle',
+    travelModeButton2Tooltip: 'Mountain bike',
+    travelModeProfile2: 'cycling-mountain',
+    travelModeProfile3: null,   // we don't want the third...
+    travelModeProfile4: null    // ...or fourth travel mode buttons
 }).addTo(map);
 ```
 

@@ -35,40 +35,40 @@ L.Control.Reachability = L.Control.extend({
         collapseButtonTooltip: 'Hide reachability options',
 
         // Draw isochrones button
-        drawButtonContent: 'Drw',
+        drawButtonContent: 'drw',
         drawButtonStyleClass: '',
         drawButtonTooltip: 'Draw reachability',
 
         // Delete button to remove any current isoline groups drawn on the map
-        deleteButtonContent: 'Del',
+        deleteButtonContent: 'del',
         deleteButtonStyleClass: '',
         deleteButtonTooltip: 'Delete reachability',
 
         // Isoline calculation mode - either distance or time
-        distanceButtonContent: 'Dst',
+        distanceButtonContent: 'dst',
         distanceButtonStyleClass: '',
         distanceButtonTooltip: 'Reachability based on distance',
 
-        timeButtonContent: 'Tme',
+        timeButtonContent: 'tme',
         timeButtonStyleClass: '',
         timeButtonTooltip: 'Reachability based on time',
 
         // Travel modes
-        drivingButtonContent: 'Drv',
-        drivingButtonStyleClass: '',
-        drivingButtonTooltip: 'Travel mode: driving',
+        travelModeButton1Content: 'car',
+        travelModeButton1StyleClass: '',
+        travelModeButton1Tooltip: 'Travel mode: car',
 
-        cyclingButtonContent: 'Cyc',
-        cyclingButtonStyleClass: '',
-        cyclingButtonTooltip: 'Travel mode: cycling',
+        travelModeButton2Content: 'cyc',
+        travelModeButton2StyleClass: '',
+        travelModeButton2Tooltip: 'Travel mode: cycling',
 
-        walkingButtonContent: 'Wlk',
-        walkingButtonStyleClass: '',
-        walkingButtonTooltip: 'Travel mode: walking',
+        travelModeButton3Content: 'wlk',
+        travelModeButton3StyleClass: '',
+        travelModeButton3Tooltip: 'Travel mode: walking',
 
-        accessibilityButtonContent: 'Acc',
-        accessibilityButtonStyleClass: '',
-        accessibilityButtonTooltip: 'Travel mode: wheelchair',
+        travelModeButton4Content: 'wch',
+        travelModeButton4StyleClass: '',
+        travelModeButton4Tooltip: 'Travel mode: wheelchair',
 
         // Control for the range parameter
         rangeControlDistanceTitle: 'Dist.',
@@ -87,11 +87,11 @@ L.Control.Reachability = L.Control.extend({
 
         // API settings
         apiKey: '',                                     // openrouteservice API key - the service which returns the isoline polygons based on the various options/parameters
-        travelModeDrivingProfile: 'driving-car',        // API choices are 'driving-car' and 'driving-hgv'
-        travelModeCyclingProfile: 'cycling-regular',    // API choices are 'cycling-regular', 'cycling-road', 'cycling-safe', 'cycling-mountain' and 'cycling-tour'
-        travelModeWalkingProfile: 'foot-walking',       // API choices are 'foot-walking' and 'foot-hiking'
-        travelModeAccessibilityProfile: 'wheelchair',   // API choices are 'wheelchair'
-        travelModeDefault: null,                        // Set travel mode default - if this is not equal to one of the 4 profiles above it is set to the value of travelModeDrivingProfile in the onAdd function
+        travelModeProfile1: 'driving-car',              // \
+        travelModeProfile2: 'cycling-regular',          //   API choices are: 'driving-car', 'driving-hgv', 'cycling-regular', 'cycling-road', 'cycling-mountain', 'cycling-electric', 'foot-walking', 'foot-hiking' and 'wheelchair'
+        travelModeProfile3: 'foot-walking',             //   Setting any of these to null results in the button not being displayed
+        travelModeProfile4: 'wheelchair',               // /
+        travelModeDefault: null,                        // Set travel mode default - if this is not equal to one of the 4 profiles above it is set to the value of travelModeProfile1 in the onAdd function
         smoothing: 0,                                   // Determines the level of generalisation applied to the isochrone polygons. Closer to 100 results in a more generalised shape
         attributes: '"area","reachfactor","total_pop"', // Optional data returned from the API: area of the isoline(s), ratio of the area of an isochrone to the theoretical area based on ecludian distance, estimated population living within the area of an isoline
 
@@ -118,10 +118,12 @@ L.Control.Reachability = L.Control.extend({
         this._deleteMode = false;
         this._rangeIsDistance = (this.options.rangeTypeDefault == 'distance') ? true : false;
 
+        // Choose the travel mode button which is selected by default
+        if (this.options.travelModeProfile1 == null) this.options.travelModeProfile1 = 'driving-car';   // travelModeProfile1 cannot be null as we must ensure we have at least one valid mode of travel to query the API
         this._travelMode = this.options.travelModeDefault;
-        if (this._travelMode != this.options.travelModeDrivingProfile && this._travelMode != this.options.travelModeCyclingProfile && this._travelMode != this.options.travelModeWalkingProfile && this._travelMode != this.options.travelModeAccessibilityProfile) this._travelMode = this.options.travelModeDrivingProfile;
+        if (this._travelMode == null || (this._travelMode != this.options.travelModeProfile1 && this._travelMode != this.options.travelModeProfile2 && this._travelMode != this.options.travelModeProfile3 && this._travelMode != this.options.travelModeProfile4)) this._travelMode = this.options.travelModeProfile1;
 
-        // invisible Leaflet marker to follow the mouse pointer when control is activated, preventing interactions with map elements which we don't want whilst in draw or delete mode
+        // Invisible Leaflet marker to follow the mouse pointer when control is activated, preventing interactions with map elements which we don't want whilst in draw or delete mode
         this._mouseMarker = null;
 
         // Holds the latest GeoJSON data returned from the API
@@ -186,20 +188,17 @@ L.Control.Reachability = L.Control.extend({
         // Container for the travel mode buttons
         this._modesContainer = L.DomUtil.create('div', 'reachability-control-settings-block-container', this._uiContainer);
 
-        // Driving profile button
-        this._drivingControl = this._createButton('span', this.options.drivingButtonContent, this.options.drivingButtonTooltip, this.options.settingsButtonStyleClass + ' ' + this.options.drivingButtonStyleClass, this._modesContainer, this._setTravelDriving);
+        // Travel mode 1 button - this is the only required button as there has to be at least one mode of travel to query the API
+        this._travelMode1Control = this._createButton('span', this.options.travelModeButton1Content, this.options.travelModeButton1Tooltip, this.options.settingsButtonStyleClass + ' ' + this.options.travelModeButton1StyleClass, this._modesContainer, this._setTravelMode1);
 
-        // Cycling profile button
-        this._cyclingControl = this._createButton('span', this.options.cyclingButtonContent, this.options.cyclingButtonTooltip, this.options.settingsButtonStyleClass + ' ' + this.options.cyclingButtonStyleClass, this._modesContainer, this._setTravelCycling);
+        // Travel mode 2 button
+        this._travelMode2Control = (this.options.travelModeProfile2 != null) ? this._createButton('span', this.options.travelModeButton2Content, this.options.travelModeButton2Tooltip, this.options.settingsButtonStyleClass + ' ' + this.options.travelModeButton2StyleClass, this._modesContainer, this._setTravelMode2) : L.DomUtil.create('span', '');
 
-        // Walking profile button
-        this._walkingControl = this._createButton('span', this.options.walkingButtonContent, this.options.walkingButtonTooltip, this.options.settingsButtonStyleClass + ' ' + this.options.walkingButtonStyleClass, this._modesContainer, this._setTravelWalking);
+        // Travel mode 3 button
+        this._travelMode3Control = (this.options.travelModeProfile3 != null) ? this._createButton('span', this.options.travelModeButton3Content, this.options.travelModeButton3Tooltip, this.options.settingsButtonStyleClass + ' ' + this.options.travelModeButton3StyleClass, this._modesContainer, this._setTravelMode3) : L.DomUtil.create('span', '');
 
-        // Accessible profile button
-        this._accessibilityControl = this._createButton('span', this.options.accessibilityButtonContent, this.options.accessibilityButtonTooltip, this.options.settingsButtonStyleClass + ' ' + this.options.accessibilityButtonStyleClass, this._modesContainer, this._setTravelAccessibility);
-        // *** NOTE: TEMPORARY LINE BELOW AS THE WHEELCHAIR PROFILE IS STILL PRODUCING UNEXPECTED RESULTS. NEED TO MAKE ENQUIRIES ***
-        L.DomUtil.addClass(this._accessibilityControl, 'reachability-control-hide-content');
-        // ***************************************************************************************
+        // Travel mode 4 button
+        this._travelMode4Control = (this.options.travelModeProfile4 != null) ? this._createButton('span', this.options.travelModeButton4Content, this.options.travelModeButton4Tooltip, this.options.settingsButtonStyleClass + ' ' + this.options.travelModeButton4StyleClass, this._modesContainer, this._setTravelMode4) : L.DomUtil.create('span', '');
 
 
         // Distance range title
@@ -549,20 +548,20 @@ L.Control.Reachability = L.Control.extend({
     },
 
     // Toggle the UI buttons for the modes of travel
-    _setTravelDriving: function () {
-        this._toggleTravelMode(this.options.travelModeDrivingProfile);
+    _setTravelMode1: function () {
+        this._toggleTravelMode(this.options.travelModeProfile1);
     },
 
-    _setTravelCycling: function () {
-        this._toggleTravelMode(this.options.travelModeCyclingProfile);
+    _setTravelMode2: function () {
+        this._toggleTravelMode(this.options.travelModeProfile2);
     },
 
-    _setTravelWalking: function () {
-        this._toggleTravelMode(this.options.travelModeWalkingProfile);
+    _setTravelMode3: function () {
+        this._toggleTravelMode(this.options.travelModeProfile3);
     },
 
-    _setTravelAccessibility: function () {
-        this._toggleTravelMode(this.options.travelModeAccessibilityProfile);
+    _setTravelMode4: function () {
+        this._toggleTravelMode(this.options.travelModeProfile4);
     },
 
     _toggleTravelMode: function (mode) {
@@ -571,29 +570,29 @@ L.Control.Reachability = L.Control.extend({
 
         if (this._travelMode != mode) {
             switch (def_mode) {
-                case this.options.travelModeCyclingProfile:
-                    L.DomUtil.removeClass(this._drivingControl, this.options.activeStyleClass);
-                    L.DomUtil.addClass(this._cyclingControl, this.options.activeStyleClass);
-                    L.DomUtil.removeClass(this._walkingControl, this.options.activeStyleClass);
-                    L.DomUtil.removeClass(this._accessibilityControl, this.options.activeStyleClass);
+                case this.options.travelModeProfile2:
+                    L.DomUtil.removeClass(this._travelMode1Control, this.options.activeStyleClass);
+                    L.DomUtil.addClass(this._travelMode2Control, this.options.activeStyleClass);
+                    L.DomUtil.removeClass(this._travelMode3Control, this.options.activeStyleClass);
+                    L.DomUtil.removeClass(this._travelMode4Control, this.options.activeStyleClass);
                     break;
-                case this.options.travelModeWalkingProfile:
-                    L.DomUtil.removeClass(this._drivingControl, this.options.activeStyleClass);
-                    L.DomUtil.removeClass(this._cyclingControl, this.options.activeStyleClass);
-                    L.DomUtil.addClass(this._walkingControl, this.options.activeStyleClass);
-                    L.DomUtil.removeClass(this._accessibilityControl, this.options.activeStyleClass);
+                case this.options.travelModeProfile3:
+                    L.DomUtil.removeClass(this._travelMode1Control, this.options.activeStyleClass);
+                    L.DomUtil.removeClass(this._travelMode2Control, this.options.activeStyleClass);
+                    L.DomUtil.addClass(this._travelMode3Control, this.options.activeStyleClass);
+                    L.DomUtil.removeClass(this._travelMode4Control, this.options.activeStyleClass);
                     break;
-                case this.options.travelModeAccessibilityProfile:
-                    L.DomUtil.removeClass(this._drivingControl, this.options.activeStyleClass);
-                    L.DomUtil.removeClass(this._cyclingControl, this.options.activeStyleClass);
-                    L.DomUtil.removeClass(this._walkingControl, this.options.activeStyleClass);
-                    L.DomUtil.addClass(this._accessibilityControl, this.options.activeStyleClass);
+                case this.options.travelModeProfile4:
+                    L.DomUtil.removeClass(this._travelMode1Control, this.options.activeStyleClass);
+                    L.DomUtil.removeClass(this._travelMode2Control, this.options.activeStyleClass);
+                    L.DomUtil.removeClass(this._travelMode3Control, this.options.activeStyleClass);
+                    L.DomUtil.addClass(this._travelMode4Control, this.options.activeStyleClass);
                     break;
                 default:
-                    L.DomUtil.addClass(this._drivingControl, this.options.activeStyleClass);
-                    L.DomUtil.removeClass(this._cyclingControl, this.options.activeStyleClass);
-                    L.DomUtil.removeClass(this._walkingControl, this.options.activeStyleClass);
-                    L.DomUtil.removeClass(this._accessibilityControl, this.options.activeStyleClass);
+                    L.DomUtil.addClass(this._travelMode1Control, this.options.activeStyleClass);
+                    L.DomUtil.removeClass(this._travelMode2Control, this.options.activeStyleClass);
+                    L.DomUtil.removeClass(this._travelMode3Control, this.options.activeStyleClass);
+                    L.DomUtil.removeClass(this._travelMode4Control, this.options.activeStyleClass);
             }
 
             this._travelMode = def_mode;
