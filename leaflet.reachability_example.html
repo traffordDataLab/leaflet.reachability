@@ -3,13 +3,13 @@
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
         <meta charset="UTF-8"/>
-        <meta name="keywords" content=""/>
-        <meta name="description" content=""/>
+        <meta name="keywords" content="reachability, isochrone, isochones, isoline, isolines, openrouteservice, leaflet, plugin, trafford, data, lab, trafford data lab, trafforddatalab"/>
+        <meta name="description" content="Demo of the Trafford Data Lab reachability plugin for Leaflet maps using the Isochrones Service API from openrouteservice."/>
         <title>Trafford Data Lab: Reachability plugin demo</title>
 
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.3/dist/leaflet.css" integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ==" crossorigin=""/>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"/>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/trafforddatalab/leaflet.reachability@v1.0.1/leaflet.reachability.min.css"/>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/trafforddatalab/leaflet.reachability@v2.0.0/leaflet.reachability.min.css"/>
 
         <style>
             html, body
@@ -38,8 +38,7 @@
         <div id="map" class="mapFullScreen"></div>
 
         <script src="https://unpkg.com/leaflet@1.3.3/dist/leaflet.js" integrity="sha512-tAGcCfR4Sc5ZP5ZoVz0quoZDYX5aCtEm/eu1KhSLj2c9eFrylXZknQYmxUssFaVJKvvc0dJQixhGjG2yXWiV9Q==" crossorigin=""></script>
-        <script src="https://cdn.jsdelivr.net/gh/trafforddatalab/leaflet.reachability@v1.0.1/leaflet.reachability.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/gh/trafforddatalab/leaflet.reachability@v1.0.1/simple_ajax_request.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/trafforddatalab/leaflet.reachability@v2.0.0/leaflet.reachability.min.js"></script>
 
         <script>
             // Example function to style the isoline polygons when they are returned from the API call
@@ -80,6 +79,7 @@
                 var layer = e.target;
                 var props = layer.feature.properties;
                 var popupContent = 'Mode of travel: ' + props['Travel mode'] + '<br />Range: 0 - ' + props['Range'] + ' ' + props['Range units'] + '<br />Area: ' + props['Area'] + ' ' + props['Area units'] + '<br />Population: ' + props['Population'];
+                if (props.hasOwnProperty('Reach factor')) popupContent += '<br />Reach factor: ' + props['Reach factor'];
                 layer.bindPopup(popupContent).openPopup();
             }
 
@@ -120,13 +120,24 @@
                 distanceButtonStyleClass: 'fa fa-road',
                 timeButtonContent: '',
                 timeButtonStyleClass: 'fa fa-clock-o',
-                drivingButtonContent: '',
-                drivingButtonStyleClass: 'fa fa-car',
-                cyclingButtonContent: '',
-                cyclingButtonStyleClass: 'fa fa-bicycle',
-                walkingButtonContent: '',
-                walkingButtonStyleClass: 'fa fa-male'
+                travelModeButton1Content: '',
+                travelModeButton1StyleClass: 'fa fa-car',
+                travelModeButton2Content: '',
+                travelModeButton2StyleClass: 'fa fa-bicycle',
+                travelModeButton3Content: '',
+                travelModeButton3StyleClass: 'fa fa-male',
+                travelModeButton4Content: '',
+                travelModeButton4StyleClass: 'fa fa-wheelchair-alt'
             }).addTo(map);
+
+            // Setup error handlers in case there is a problem when calling the API
+            map.on('reachability:error', function () {
+                alert('Unfortunately there has been an error calling the API.\nMore details are available in the console.');
+            });
+
+            map.on('reachability:no_data', function () {
+                alert('Unfortunately no data was received from the API.\n');
+            });
         </script>
     </body>
 </html>

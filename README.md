@@ -8,7 +8,7 @@ We have published an [article](https://medium.com/@traffordDataLab/out-of-reach-
 - [Finding a common location within reach](https://vimeo.com/292728150)
 
 ## Documentation (v2.0.0)
-You will need to obtain a free API key from <a href="https://openrouteservice.org/dev/#/signup">openrouteservice</a> before using this plugin. Please do not use the key from the demo in your own applications. Consult the [change log](changelog.md) to find out what has changed from previous versions.
+You will need to obtain a free API key from <a href="https://openrouteservice.org/dev/#/signup">openrouteservice</a> before using this plugin. Please do not use the key from the demo in your own applications. Consult the [changelog](CHANGELOG.md) to find out what has changed from previous versions.
 
 After including the CSS and JS in your page (NOTE - you can also use minified versions e.g. .min.js/.min.css if you prefer):...
 ```HTML
