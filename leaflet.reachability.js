@@ -1,10 +1,11 @@
 /*
-    Created:        2018/06/12 by James Austin - Trafford Data Lab
+    Created:        2018-06-12 by James Austin - Trafford Data Lab
+    Latest update:  2020-11-27
     Purpose:        Uses openrouteservice API to create isolines showing areas within reach of certain travel times based on different modes of travel or distance. See https://wiki.openstreetmap.org/wiki/Isochrone for more information
     Dependencies:   Leaflet.js (external library), openrouteservice.org API (requires a key - free service available via registration)
     Licence:        https://github.com/traffordDataLab/leaflet.reachability/blob/master/LICENSE
+    Attribution:    © openrouteservice.org by HeiGIT | Map data © OpenStreetMap contributors
     Notes:          Can be displayed in a collapsed or expanded state. Content for all GUI elements can be html or an icon etc.
-                    © Powered by openrouteservice https://openrouteservice.org/
 */
 L.Control.Reachability = L.Control.extend({
     options: {
@@ -111,7 +112,7 @@ L.Control.Reachability = L.Control.extend({
 
     onAdd: function (map) {
         // Initial settings
-        this.version = '2.0.0';
+        this.version = '2.0.1';
         this._map = map;
         this._collapsed = this.options.collapsed;
         this._drawMode = false;
@@ -130,7 +131,7 @@ L.Control.Reachability = L.Control.extend({
         this.latestIsolines = null;
 
         // Group object to hold each GeoJSON 'set' of isolines return from the API via this.latestIsolines
-        this.isolinesGroup = L.geoJSON(null, { style: this.options.styleFn, pane: this.options.pane, attribution: '&copy; Powered by <a href="https://openrouteservice.org/" target="_blank">openrouteservice</a>' })
+        this.isolinesGroup = L.geoJSON(null, { style: this.options.styleFn, pane: this.options.pane, attribution: '&copy; <a href="https://openrouteservice.org/" target="_blank">openrouteservice.org</a> by HeiGIT | Map data &copy; <a href="https://www.openstreetmap.org" target="_blank">OpenStreetMap</a> contributors' })
 
         // Main container for the control - this is added to the map in the Leaflet control pane
         this._container = L.DomUtil.create('div', 'leaflet-bar ' + this.options.controlContainerStyleClass);
