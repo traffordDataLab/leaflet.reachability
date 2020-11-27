@@ -7,13 +7,13 @@ We have published an [article](https://medium.com/@traffordDataLab/out-of-reach-
 - [How many facilities are within a 15 minute walk?](https://vimeo.com/291529944)
 - [Finding a common location within reach](https://vimeo.com/292728150)
 
-## Documentation (v2.0.0)
-You will need to obtain a free API key from <a href="https://openrouteservice.org/dev/#/signup">openrouteservice</a> before using this plugin. Please do not use the key from the demo in your own applications. Consult the [changelog](CHANGELOG.md) to find out what has changed from previous versions.
+## Documentation (v2.0.1)
+You will need to obtain a free API key from [openrouteservice](https://openrouteservice.org/dev/#/signup) before using this plugin. Please do not use the key from the demo in your own applications. Consult the [changelog](CHANGELOG.md) to find out what has changed from previous versions.
 
 After including the CSS and JS in your page (NOTE - you can also use minified versions e.g. .min.js/.min.css if you prefer):...
 ```HTML
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/trafforddatalab/leaflet.reachability@v2.0.0/leaflet.reachability.css"/>
-<script src="https://cdn.jsdelivr.net/gh/trafforddatalab/leaflet.reachability@v2.0.0/leaflet.reachability.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/trafforddatalab/leaflet.reachability@v2.0.1/leaflet.reachability.css"/>
+<script src="https://cdn.jsdelivr.net/gh/trafforddatalab/leaflet.reachability@v2.0.1/leaflet.reachability.js"></script>
 ```
 
 ...you can then initialise the plugin in the standard Leaflet way adding it to a map instance:
@@ -250,7 +250,7 @@ These properties can be bound to a popup or displayed within a custom container 
 
 **Version**
 
-If the plugin was initialised with an object called `reachabilityControl`, you can obtain the version number using `reachabilityControl.version`. This will return a string in the [Semantic Versioning](https://semver.org/spec/v2.0.0.html) format `"MAJOR.MINOR.PATCH"` e.g. `"2.0.0"`.
+If the plugin was initialised with an object called `reachabilityControl`, you can obtain the version number using `reachabilityControl.version`. This will return a string in the [Semantic Versioning](https://semver.org/spec/v2.0.0.html) format `"MAJOR.MINOR.PATCH"` e.g. `"2.0.1"`.
 
 ### Examples
 
@@ -423,3 +423,6 @@ L.control.reachability({
 
 ## Licence
 This software is provided under the terms of the [MIT License](https://github.com/traffordDataLab/leaflet.reachability/blob/master/LICENSE).
+
+## Attribution
+&copy; [openrouteservice.org](https://openrouteservice.org) by HeiGIT | Map data &copy; [OpenStreetMap](https://www.openstreetmap.org) contributors
