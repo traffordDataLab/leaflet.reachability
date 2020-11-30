@@ -131,7 +131,7 @@ L.Control.Reachability = L.Control.extend({
         this.latestIsolines = null;
 
         // Group object to hold each GeoJSON 'set' of isolines return from the API via this.latestIsolines
-        this.isolinesGroup = L.geoJSON(null, { style: this.options.styleFn, pane: this.options.pane, attribution: '&copy; <a href="https://openrouteservice.org/" target="_blank">openrouteservice.org</a> by HeiGIT | Map data &copy; <a href="https://www.openstreetmap.org" target="_blank">OpenStreetMap</a> contributors' })
+        this.isolinesGroup = L.geoJSON(null, { style: this.options.styleFn, pane: this.options.pane, attribution: '&copy; <a href="https://openrouteservice.org/" target="_blank">openrouteservice.org</a> by HeiGIT | Map data &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors' })
 
         // Main container for the control - this is added to the map in the Leaflet control pane
         this._container = L.DomUtil.create('div', 'leaflet-bar ' + this.options.controlContainerStyleClass);
