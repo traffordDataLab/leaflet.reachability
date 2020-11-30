@@ -1,5 +1,10 @@
 # leaflet.reachability Changelog
 
+## 2.0.1 (2020-11-27)
+Minor update to the attribution in accordance with the [OpenRouteService updated terms of service](https://openrouteservice.org/terms-of-service/).
+
+- Attribution added to Leaflet map when a reachability area is created now reads: &copy; [openrouteservice.org](https://openrouteservice.org) by HeiGIT | Map data &copy; [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors
+
 ## 2.0.0 (2019-06-14)
 This is a new major version release and so contains breaking changes compared to previous versions.
 
