@@ -425,4 +425,4 @@ L.control.reachability({
 This software is provided under the terms of the [MIT License](https://github.com/traffordDataLab/leaflet.reachability/blob/master/LICENSE).
 
 ## Attribution
-&copy; [openrouteservice.org](https://openrouteservice.org) by HeiGIT | Map data &copy; [OpenStreetMap](https://www.openstreetmap.org) contributors
+&copy; [openrouteservice.org](https://openrouteservice.org) by HeiGIT | Map data &copy; [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors
