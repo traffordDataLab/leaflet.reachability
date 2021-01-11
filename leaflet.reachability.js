@@ -1,6 +1,6 @@
 /*
-    Created:        2018-06-12 by James Austin - Trafford Data Lab
-    Latest update:  2020-11-27
+    Created:        2018-06-12 by James Austin - Trafford Data Lab https://www.trafforddatalab.io | https://github.com/trafforddatalab
+    Latest update:  2021-01-08
     Purpose:        Uses openrouteservice API to create isolines showing areas within reach of certain travel times based on different modes of travel or distance. See https://wiki.openstreetmap.org/wiki/Isochrone for more information
     Dependencies:   Leaflet.js (external library), openrouteservice.org API (requires a key - free service available via registration)
     Licence:        https://github.com/traffordDataLab/leaflet.reachability/blob/master/LICENSE
@@ -112,7 +112,7 @@ L.Control.Reachability = L.Control.extend({
 
     onAdd: function (map) {
         // Initial settings
-        this.version = '2.0.1';
+        this.version = '2.0.2';
         this._map = map;
         this._collapsed = this.options.collapsed;
         this._drawMode = false;
@@ -203,11 +203,13 @@ L.Control.Reachability = L.Control.extend({
 
 
         // Distance range title
-        this._rangeDistanceTitle = L.DomUtil.create('span', 'reachability-control-range-title reachability-control-hide-content', this._uiContainer);
+        this._rangeDistanceTitle = L.DomUtil.create('label', 'reachability-control-range-title reachability-control-hide-content', this._uiContainer);
+        this._rangeDistanceTitle.setAttribute('for', 'rangeDistanceSelect');
         this._rangeDistanceTitle.innerHTML = this.options.rangeControlDistanceTitle;
 
         // Distance range control
         this._rangeDistanceList = L.DomUtil.create('select', 'reachability-control-range-list reachability-control-hide-content', this._uiContainer);
+        this._rangeDistanceList.setAttribute('id', 'rangeDistanceSelect');
         if (this.options.rangeControlDistance == null) {
             // Calculate the greatest number of decimal places required for the values displayed in the select list.
             var decimalPlacesDistance = Math.max(this._decimalPlaces(this.options.rangeControlDistanceMax), this._decimalPlaces(this.options.rangeControlDistanceInterval));
@@ -231,11 +233,13 @@ L.Control.Reachability = L.Control.extend({
 
 
         // Time range title
-        this._rangeTimeTitle = L.DomUtil.create('span', 'reachability-control-range-title reachability-control-hide-content', this._uiContainer);
+        this._rangeTimeTitle = L.DomUtil.create('label', 'reachability-control-range-title reachability-control-hide-content', this._uiContainer);
+        this._rangeTimeTitle.setAttribute('for', 'rangeTimeSelect');
         this._rangeTimeTitle.innerHTML = this.options.rangeControlTimeTitle;
 
         // Time range control
         this._rangeTimeList = L.DomUtil.create('select', 'reachability-control-range-list reachability-control-hide-content', this._uiContainer);
+        this._rangeTimeList.setAttribute('id', 'rangeTimeSelect');
         if (this.options.rangeControlTime == null) {
             // Calculate the greatest number of decimal places required for the values displayed in the select list.
             var decimalPlacesTime = Math.max(this._decimalPlaces(this.options.rangeControlTimeMax), this._decimalPlaces(this.options.rangeControlTimeInterval));
@@ -302,6 +306,9 @@ L.Control.Reachability = L.Control.extend({
 
             // Create a button to collapse the user interface - this is displayed underneath the user interface
             this._createButton('span', this.options.collapseButtonContent, this.options.collapseButtonTooltip, this.options.collapseButtonStyleClass, this._uiContainer, this._collapse);
+
+            // Set the initial expanded state to false. Important: we don't need to set this attribute if the control is always expanded - i.e. this._collapsed == false
+            this._container.setAttribute('aria-expanded', 'false');
         }
     },
 
@@ -337,6 +344,9 @@ L.Control.Reachability = L.Control.extend({
         // Remove the active class from the control container if either the draw or delete modes are active
         if (L.DomUtil.hasClass(this._container, this.options.activeStyleClass)) L.DomUtil.removeClass(this._container, this.options.activeStyleClass);
 
+        // Set the expanded state to true
+        this._container.setAttribute('aria-expanded', 'true');
+
         // Fire event to inform that the control has been expanded
         this._map.fire('reachability:control_expanded');
     },
@@ -350,6 +360,9 @@ L.Control.Reachability = L.Control.extend({
 
         // Add the active class to the control container if either the draw or delete modes are active
         if ((this._drawMode || this._deleteMode) && !L.DomUtil.hasClass(this._container, this.options.activeStyleClass)) L.DomUtil.addClass(this._container, this.options.activeStyleClass);
+
+        // Set the expanded state to false
+        this._container.setAttribute('aria-expanded', 'false');
 
         // Fire event to inform that the control has been collapsed
         this._map.fire('reachability:control_collapsed');
