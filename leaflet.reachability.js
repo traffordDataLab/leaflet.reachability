@@ -72,13 +72,13 @@ L.Control.Reachability = L.Control.extend({
         travelModeButton4Tooltip: 'Travel mode: wheelchair',
 
         // Control for the range parameter
-        rangeControlDistanceTitle: 'Dist.',
+        rangeControlDistanceLabel: 'Dist.',
         rangeControlDistance: null,                     // Custom range specified as an array which supersedes rangeControlDistanceMax and rangeControlDistanceInterval if not null
         rangeControlDistanceMax: 3,
         rangeControlDistanceInterval: 0.5,
         rangeControlDistanceUnits: 'km',                // Can be either 'm', 'km' or 'mi'
 
-        rangeControlTimeTitle: 'Time',
+        rangeControlTimeLabel: 'Time',
         rangeControlTime: null,                         // \  Custom range specified as an array which supersedes rangeControlTimeMax and rangeControlTimeInterval if not null
         rangeControlTimeMax: 30,                        //  > All these values will be multiplied by 60 to convert to seconds - no other unit of time is allowed
         rangeControlTimeInterval: 5,                    // /
@@ -112,7 +112,7 @@ L.Control.Reachability = L.Control.extend({
 
     onAdd: function (map) {
         // Initial settings
-        this.version = '2.0.2';
+        this.version = '3.0.0';
         this._map = map;
         this._collapsed = this.options.collapsed;
         this._drawMode = false;
@@ -174,38 +174,38 @@ L.Control.Reachability = L.Control.extend({
         this._actionsAndModesContainer = L.DomUtil.create('div', 'reachability-control-settings-block-container', this._uiContainer);
 
         // Draw button - to create isolines
-        this._drawControl = this._createButton('span', this.options.drawButtonContent, this.options.drawButtonTooltip, this.options.settingsButtonStyleClass + ' ' + this.options.drawButtonStyleClass, this._actionsAndModesContainer, this._toggleDraw);
+        this._drawControl = this._createButton('button', this.options.drawButtonContent, this.options.drawButtonTooltip, this.options.settingsButtonStyleClass + ' ' + this.options.drawButtonStyleClass, this._actionsAndModesContainer, this._toggleDraw);
 
         // Delete button - to remove isolines
-        this._deleteControl = this._createButton('span', this.options.deleteButtonContent, this.options.deleteButtonTooltip, this.options.settingsButtonStyleClass + ' ' + this.options.deleteButtonStyleClass, this._actionsAndModesContainer, this._toggleDelete);
+        this._deleteControl = this._createButton('button', this.options.deleteButtonContent, this.options.deleteButtonTooltip, this.options.settingsButtonStyleClass + ' ' + this.options.deleteButtonStyleClass, this._actionsAndModesContainer, this._toggleDelete);
 
         // Distance setting button - to calculate isolines based on distance (isodistance)
-        this._distanceControl = this._createButton('span', this.options.distanceButtonContent, this.options.distanceButtonTooltip, this.options.settingsButtonStyleClass + ' ' + this.options.distanceButtonStyleClass, this._actionsAndModesContainer, this._setRangeByDistance);
+        this._distanceControl = this._createButton('button', this.options.distanceButtonContent, this.options.distanceButtonTooltip, this.options.settingsButtonStyleClass + ' ' + this.options.distanceButtonStyleClass, this._actionsAndModesContainer, this._setRangeByDistance);
 
         // Time setting button - to calculate isolines based on time (isochrones)
-        this._timeControl = this._createButton('span', this.options.timeButtonContent, this.options.timeButtonTooltip, this.options.settingsButtonStyleClass + ' ' + this.options.timeButtonStyleClass, this._actionsAndModesContainer, this._setRangeByTime);
+        this._timeControl = this._createButton('button', this.options.timeButtonContent, this.options.timeButtonTooltip, this.options.settingsButtonStyleClass + ' ' + this.options.timeButtonStyleClass, this._actionsAndModesContainer, this._setRangeByTime);
 
 
         // Container for the travel mode buttons
         this._modesContainer = L.DomUtil.create('div', 'reachability-control-settings-block-container', this._uiContainer);
 
         // Travel mode 1 button - this is the only required button as there has to be at least one mode of travel to query the API
-        this._travelMode1Control = this._createButton('span', this.options.travelModeButton1Content, this.options.travelModeButton1Tooltip, this.options.settingsButtonStyleClass + ' ' + this.options.travelModeButton1StyleClass, this._modesContainer, this._setTravelMode1);
+        this._travelMode1Control = this._createButton('button', this.options.travelModeButton1Content, this.options.travelModeButton1Tooltip, this.options.settingsButtonStyleClass + ' ' + this.options.travelModeButton1StyleClass, this._modesContainer, this._setTravelMode1);
 
         // Travel mode 2 button
-        this._travelMode2Control = (this.options.travelModeProfile2 != null) ? this._createButton('span', this.options.travelModeButton2Content, this.options.travelModeButton2Tooltip, this.options.settingsButtonStyleClass + ' ' + this.options.travelModeButton2StyleClass, this._modesContainer, this._setTravelMode2) : L.DomUtil.create('span', '');
+        this._travelMode2Control = (this.options.travelModeProfile2 != null) ? this._createButton('button', this.options.travelModeButton2Content, this.options.travelModeButton2Tooltip, this.options.settingsButtonStyleClass + ' ' + this.options.travelModeButton2StyleClass, this._modesContainer, this._setTravelMode2) : L.DomUtil.create('span', '');
 
         // Travel mode 3 button
-        this._travelMode3Control = (this.options.travelModeProfile3 != null) ? this._createButton('span', this.options.travelModeButton3Content, this.options.travelModeButton3Tooltip, this.options.settingsButtonStyleClass + ' ' + this.options.travelModeButton3StyleClass, this._modesContainer, this._setTravelMode3) : L.DomUtil.create('span', '');
+        this._travelMode3Control = (this.options.travelModeProfile3 != null) ? this._createButton('button', this.options.travelModeButton3Content, this.options.travelModeButton3Tooltip, this.options.settingsButtonStyleClass + ' ' + this.options.travelModeButton3StyleClass, this._modesContainer, this._setTravelMode3) : L.DomUtil.create('span', '');
 
         // Travel mode 4 button
-        this._travelMode4Control = (this.options.travelModeProfile4 != null) ? this._createButton('span', this.options.travelModeButton4Content, this.options.travelModeButton4Tooltip, this.options.settingsButtonStyleClass + ' ' + this.options.travelModeButton4StyleClass, this._modesContainer, this._setTravelMode4) : L.DomUtil.create('span', '');
+        this._travelMode4Control = (this.options.travelModeProfile4 != null) ? this._createButton('button', this.options.travelModeButton4Content, this.options.travelModeButton4Tooltip, this.options.settingsButtonStyleClass + ' ' + this.options.travelModeButton4StyleClass, this._modesContainer, this._setTravelMode4) : L.DomUtil.create('span', '');
 
 
         // Distance range title
-        this._rangeDistanceTitle = L.DomUtil.create('label', 'reachability-control-range-title reachability-control-hide-content', this._uiContainer);
-        this._rangeDistanceTitle.setAttribute('for', 'rangeDistanceSelect');
-        this._rangeDistanceTitle.innerHTML = this.options.rangeControlDistanceTitle;
+        this._rangeDistanceLabel = L.DomUtil.create('label', 'reachability-control-range-title reachability-control-hide-content', this._uiContainer);
+        this._rangeDistanceLabel.setAttribute('for', 'rangeDistanceSelect');
+        this._rangeDistanceLabel.innerHTML = this.options.rangeControlDistanceLabel;
 
         // Distance range control
         this._rangeDistanceList = L.DomUtil.create('select', 'reachability-control-range-list reachability-control-hide-content', this._uiContainer);
@@ -233,9 +233,9 @@ L.Control.Reachability = L.Control.extend({
 
 
         // Time range title
-        this._rangeTimeTitle = L.DomUtil.create('label', 'reachability-control-range-title reachability-control-hide-content', this._uiContainer);
-        this._rangeTimeTitle.setAttribute('for', 'rangeTimeSelect');
-        this._rangeTimeTitle.innerHTML = this.options.rangeControlTimeTitle;
+        this._rangeTimeLabel = L.DomUtil.create('label', 'reachability-control-range-title reachability-control-hide-content', this._uiContainer);
+        this._rangeTimeLabel.setAttribute('for', 'rangeTimeSelect');
+        this._rangeTimeLabel.innerHTML = this.options.rangeControlTimeLabel;
 
         // Time range control
         this._rangeTimeList = L.DomUtil.create('select', 'reachability-control-range-list reachability-control-hide-content', this._uiContainer);
@@ -279,12 +279,12 @@ L.Control.Reachability = L.Control.extend({
         // Select the correct range type button and show the correct range list
         if (this._rangeIsDistance) {
             L.DomUtil.addClass(this._distanceControl, this.options.activeStyleClass);
-            L.DomUtil.removeClass(this._rangeDistanceTitle, 'reachability-control-hide-content');
+            L.DomUtil.removeClass(this._rangeDistanceLabel, 'reachability-control-hide-content');
             L.DomUtil.removeClass(this._rangeDistanceList, 'reachability-control-hide-content');
         }
         else {
             L.DomUtil.addClass(this._timeControl, this.options.activeStyleClass);
-            L.DomUtil.removeClass(this._rangeTimeTitle, 'reachability-control-hide-content');
+            L.DomUtil.removeClass(this._rangeTimeLabel, 'reachability-control-hide-content');
             L.DomUtil.removeClass(this._rangeTimeList, 'reachability-control-hide-content');
         }
 
@@ -302,10 +302,11 @@ L.Control.Reachability = L.Control.extend({
             this._container.appendChild(this._expandButtonContainer);
 
             // Create a button to expand the control to reveal the full user interface
+            // Sticking with creating this as an anchor element for now as per other Leaflet controls such as Zoom, but monitoring the situation for changes e.g. https://github.com/Leaflet/Leaflet/issues/7368
             this._createButton('a', this.options.expandButtonContent, this.options.expandButtonTooltip, this.options.expandButtonStyleClass, this._expandButtonContainer, this._expand);
 
             // Create a button to collapse the user interface - this is displayed underneath the user interface
-            this._createButton('span', this.options.collapseButtonContent, this.options.collapseButtonTooltip, this.options.collapseButtonStyleClass, this._uiContainer, this._collapse);
+            this._createButton('button', this.options.collapseButtonContent, this.options.collapseButtonTooltip, this.options.collapseButtonStyleClass, this._uiContainer, this._collapse);
 
             // Set the initial expanded state to false. Important: we don't need to set this attribute if the control is always expanded - i.e. this._collapsed == false
             this._container.setAttribute('aria-expanded', 'false');
@@ -532,8 +533,8 @@ L.Control.Reachability = L.Control.extend({
             L.DomUtil.removeClass(this._timeControl, this.options.activeStyleClass);
 
             // The range titles
-            L.DomUtil.removeClass(this._rangeDistanceTitle, 'reachability-control-hide-content');
-            L.DomUtil.addClass(this._rangeTimeTitle, 'reachability-control-hide-content');
+            L.DomUtil.removeClass(this._rangeDistanceLabel, 'reachability-control-hide-content');
+            L.DomUtil.addClass(this._rangeTimeLabel, 'reachability-control-hide-content');
 
             // The range lists
             L.DomUtil.removeClass(this._rangeDistanceList, 'reachability-control-hide-content');
@@ -550,8 +551,8 @@ L.Control.Reachability = L.Control.extend({
             L.DomUtil.removeClass(this._distanceControl, this.options.activeStyleClass);
 
             // The range titles
-            L.DomUtil.removeClass(this._rangeTimeTitle, 'reachability-control-hide-content');
-            L.DomUtil.addClass(this._rangeDistanceTitle, 'reachability-control-hide-content');
+            L.DomUtil.removeClass(this._rangeTimeLabel, 'reachability-control-hide-content');
+            L.DomUtil.addClass(this._rangeDistanceLabel, 'reachability-control-hide-content');
 
             // The range lists
             L.DomUtil.removeClass(this._rangeTimeList, 'reachability-control-hide-content');
