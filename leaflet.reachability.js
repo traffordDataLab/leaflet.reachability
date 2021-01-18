@@ -350,6 +350,9 @@ L.Control.Reachability = L.Control.extend({
 
         // Fire event to inform that the control has been expanded
         this._map.fire('reachability:control_expanded');
+
+        // Focus on the draw button
+        this._drawControl.focus();
     },
 
     _collapse: function () {
