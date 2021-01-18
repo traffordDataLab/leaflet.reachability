@@ -303,7 +303,7 @@ L.Control.Reachability = L.Control.extend({
 
             // Create a button to expand the control to reveal the full user interface
             // Sticking with creating this as an anchor element for now as per other Leaflet controls such as Zoom, but monitoring the situation for changes e.g. https://github.com/Leaflet/Leaflet/issues/7368
-            this._createButton('a', this.options.expandButtonContent, this.options.expandButtonTooltip, this.options.expandButtonStyleClass, this._expandButtonContainer, this._expand);
+            this._expandButton = this._createButton('a', this.options.expandButtonContent, this.options.expandButtonTooltip, this.options.expandButtonStyleClass, this._expandButtonContainer, this._expand);
 
             // Create a button to collapse the user interface - this is displayed underneath the user interface
             this._createButton('button', this.options.collapseButtonContent, this.options.collapseButtonTooltip, this.options.collapseButtonStyleClass, this._uiContainer, this._collapse);
@@ -345,14 +345,12 @@ L.Control.Reachability = L.Control.extend({
         // Remove the active class from the control container if either the draw or delete modes are active
         if (L.DomUtil.hasClass(this._container, this.options.activeStyleClass)) L.DomUtil.removeClass(this._container, this.options.activeStyleClass);
 
-        // Set the expanded state to true
+        // Accessibility: set the expanded state of the control container to true and focus on the draw button for ease of keyboard navigation
         this._container.setAttribute('aria-expanded', 'true');
+        this._drawControl.focus();
 
         // Fire event to inform that the control has been expanded
         this._map.fire('reachability:control_expanded');
-
-        // Focus on the draw button
-        this._drawControl.focus();
     },
 
     _collapse: function () {
@@ -365,8 +363,9 @@ L.Control.Reachability = L.Control.extend({
         // Add the active class to the control container if either the draw or delete modes are active
         if ((this._drawMode || this._deleteMode) && !L.DomUtil.hasClass(this._container, this.options.activeStyleClass)) L.DomUtil.addClass(this._container, this.options.activeStyleClass);
 
-        // Set the expanded state to false
+        // Accessibility: set the expanded state of the control container to false and focus on the expand button for ease of keyboard navigation
         this._container.setAttribute('aria-expanded', 'false');
+        this._expandButton.focus();
 
         // Fire event to inform that the control has been collapsed
         this._map.fire('reachability:control_collapsed');
