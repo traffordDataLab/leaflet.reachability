@@ -166,21 +166,11 @@ L.Control.Reachability = L.Control.extend({
     },
 
     _createUI: function () {
-        // If the control is in its collapsed state we need to create buttons to toggle between collapsed and expanded states and initially hide the main UI
         if (this._collapsed) {
-            /*
-            // Create a container for the expand button - because we cannot easily hide a link tag created via the _createButton function adding the .reachability-control-hide-content CSS class
-            this._expandButtonContainer = L.DomUtil.create('span', '');
-            this._container.appendChild(this._expandButtonContainer);
-            */
-
-            // Create a button to expand the control to reveal the full user interface
+            // If the control is in its collapsed state we need to create a button to toggle between collapsed and expanded states and initially hide the main UI
             // Sticking with creating this as an anchor element for now as per other Leaflet controls such as Zoom, but monitoring the situation for changes e.g. https://github.com/Leaflet/Leaflet/issues/7368
             this._expandCollapseToggleButton = this._createButton('a', this.options.expandButtonContent, this.options.expandButtonTooltip, this.options.expandButtonStyleClass, this._container, this._expandCollapseToggle);
             this._expandCollapseToggleButton.setAttribute('aria-expanded', 'false');
-
-            // Create a button to collapse the user interface - this is displayed underneath the user interface
-            //this._createButton('button', this.options.collapseButtonContent, this.options.collapseButtonTooltip, this.options.collapseButtonStyleClass, this._uiContainer, this._collapse);
         }
 
         // Container for the user interface controls - these will be displayed permanently if the collapsed option is false, otherwise when the user clicks on the collapsed control toggle button
@@ -190,6 +180,7 @@ L.Control.Reachability = L.Control.extend({
 
         // Container for the action and mode buttons
         this._actionsAndModesContainer = L.DomUtil.create('div', 'reachability-control-settings-block-container', this._uiContainer);
+
 
         // Draw button - to create isolines
         this._drawControl = this._createButton('button', this.options.drawButtonContent, this.options.drawButtonTooltip, this.options.settingsButtonStyleClass + ' ' + this.options.drawButtonStyleClass, this._actionsAndModesContainer, this._toggleDraw);
@@ -319,13 +310,10 @@ L.Control.Reachability = L.Control.extend({
         button.innerHTML = html;
         button.title = title;
 
-        if (tag === 'button') button.setAttribute('type', 'button');    // this prevents the button from performing a submit action
-        if (tag === 'a') button.href = 'javascript:void(0)';            // we need an href property otherwise we can't focus with the keyboard despite having tabindex="0", however using href="#" puts the focus at the top of the page
-
-        // For assistive technologies e.g. screen readers
+        // For accessibility
         button.setAttribute('aria-label', title);
-        button.setAttribute('tab-index', '0');
-        button.setAttribute('role', 'button');                          // doesn't matter if the element is actually a button, but this helps ensure CSS etc. is consistent if [role="button"] is used as a selector
+        button.setAttribute('tabindex', '0');       // this allows the element if it is not a <button> to be focussable - especially important if it is an anchor as we are not setting the href property, see: https://github.com/Leaflet/Leaflet/issues/7368
+        button.setAttribute('role', 'button');      // doesn't matter if the element is actually a button, but this helps ensure CSS etc. is consistent if [role="button"] is used as a selector
 
         // Set events
         L.DomEvent
@@ -333,9 +321,24 @@ L.Control.Reachability = L.Control.extend({
             .on(button, 'click', L.DomEvent.stop)
             .on(button, 'click', fn, this);
 
+        if (tag === 'button') {
+            button.setAttribute('type', 'button');  // this prevents the <button> from performing a submit action
+        }
+        else {
+            // As the button is not a <button> element we need to add keyboard events to allow it to be pressed using space and enter for accessibility
+            L.DomEvent.on(button, 'keydown', function(e) {
+                var val = e.charCode || e.keyCode;  // The space key returns 13 in charCode whereas the enter key returns 32 in keyCode.
+                if (val === 13 || val === 32) {     // We're only interested in the space or enter key
+                    e.preventDefault();             // Prevent default behaviour such as scrolling down the page with the space key or submitting with the enter key
+                    fn.call(this);                  // Call the required function
+                }
+            }, this);
+        }
+
 		return button;
 	},
 
+    // Decide whether we need to expand or collapse the UI based on the aria-expanded attribute
     _expandCollapseToggle: function () {
         (this._expandCollapseToggleButton.getAttribute('aria-expanded') === 'true') ? this._collapse() : this._expand();
     },
