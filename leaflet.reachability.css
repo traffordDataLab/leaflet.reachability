@@ -8,31 +8,31 @@
 {
     font-size: 22px;
 }
-
-/* Button to collapse the reachability control when in a toggleable state */
-.reachability-control-collapse-button
+/* We need to specify the ".leaflet-bar a" class and selector specifically for the following in order to override the default Leaflet control styles */
+.leaflet-bar a.reachability-control-expand-button
 {
-    width: 100%;
-    height: 22px;
-    border-radius: 5px;
-    font-size: 18px;
-    margin: 5px 0 0 0;
-    padding: 0;
-    color: #707070;
-    background-color: #f4f4f4;
-    border: 1px solid transparent;
+    min-width: 100%;    /* makes the button fill the width of the UI container when in expanded state */
 }
-.reachability-control-collapse-button:hover
+.leaflet-bar a.reachability-control-expand-button[aria-expanded="false"],
+.leaflet-bar a.reachability-control-expand-button[aria-expanded="false"]:hover
 {
-    border: 1px dotted #757575;
+    border-bottom: none;                /* removes the border when the UI is collapsed - even though the UI is is hidden, the button is still the 'first-child' element in the control so Leaflet adds a border */
+    border-bottom-left-radius: 4px;     /* for a similar reason, as it's not the last child... */
+    border-bottom-right-radius: 4px;    /* ...the bottom corners are not rounded by default */
 }
 
 /* The container for the reachability control user interface */
 .reachability-control-settings-container
 {
     background: #fff;
-    padding: 6px;
-    border-radius: 5px;
+    padding: 10px 6px 6px 6px;
+    border-radius: 4px;
+}
+/* Remove the rounded corners at the top of the UI if the show/hide button is above it, i.e. collapsed = true */
+a.reachability-control-expand-button + div.reachability-control-settings-container
+{
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
 }
 
 /* General class for styling the 'button' controls in the user interface container */

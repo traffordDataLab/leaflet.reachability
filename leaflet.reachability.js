@@ -166,8 +166,26 @@ L.Control.Reachability = L.Control.extend({
     },
 
     _createUI: function () {
+        // If the control is in its collapsed state we need to create buttons to toggle between collapsed and expanded states and initially hide the main UI
+        if (this._collapsed) {
+            /*
+            // Create a container for the expand button - because we cannot easily hide a link tag created via the _createButton function adding the .reachability-control-hide-content CSS class
+            this._expandButtonContainer = L.DomUtil.create('span', '');
+            this._container.appendChild(this._expandButtonContainer);
+            */
+
+            // Create a button to expand the control to reveal the full user interface
+            // Sticking with creating this as an anchor element for now as per other Leaflet controls such as Zoom, but monitoring the situation for changes e.g. https://github.com/Leaflet/Leaflet/issues/7368
+            this._expandCollapseToggleButton = this._createButton('a', this.options.expandButtonContent, this.options.expandButtonTooltip, this.options.expandButtonStyleClass, this._container, this._expandCollapseToggle);
+            this._expandCollapseToggleButton.setAttribute('aria-expanded', 'false');
+
+            // Create a button to collapse the user interface - this is displayed underneath the user interface
+            //this._createButton('button', this.options.collapseButtonContent, this.options.collapseButtonTooltip, this.options.collapseButtonStyleClass, this._uiContainer, this._collapse);
+        }
+
         // Container for the user interface controls - these will be displayed permanently if the collapsed option is false, otherwise when the user clicks on the collapsed control toggle button
         this._uiContainer = L.DomUtil.create('div', this.options.settingsContainerStyleClass);
+        if (this._collapsed) L.DomUtil.addClass(this._uiContainer, 'reachability-control-hide-content');    // Hide the UI initially as the control is in the collapsed state
         this._container.appendChild(this._uiContainer);
 
         // Container for the action and mode buttons
@@ -175,6 +193,7 @@ L.Control.Reachability = L.Control.extend({
 
         // Draw button - to create isolines
         this._drawControl = this._createButton('button', this.options.drawButtonContent, this.options.drawButtonTooltip, this.options.settingsButtonStyleClass + ' ' + this.options.drawButtonStyleClass, this._actionsAndModesContainer, this._toggleDraw);
+        this._drawControl.setAttribute('aria-pressed', 'false') // Accessibility: indicate that the button is not currently pressed
 
         // Delete button - to remove isolines
         this._deleteControl = this._createButton('button', this.options.deleteButtonContent, this.options.deleteButtonTooltip, this.options.settingsButtonStyleClass + ' ' + this.options.deleteButtonStyleClass, this._actionsAndModesContainer, this._toggleDelete);
@@ -290,27 +309,6 @@ L.Control.Reachability = L.Control.extend({
 
         // Select the correct travel mode button
         this._toggleTravelMode(null);   // Null causes the function to operate in a different way, setting up the initial state
-
-
-        // If the control is in its collapsed state we need to create buttons to toggle between collapsed and expanded states and initially hide the main UI
-        if (this._collapsed) {
-            // Hide the UI initially as the control is in the collapsed state
-            L.DomUtil.addClass(this._uiContainer, 'reachability-control-hide-content');
-
-            // Create a container for the expand button - because we cannot easily hide a link tag created via the _createButton function adding the .reachability-control-hide-content CSS class
-            this._expandButtonContainer = L.DomUtil.create('span', '');
-            this._container.appendChild(this._expandButtonContainer);
-
-            // Create a button to expand the control to reveal the full user interface
-            // Sticking with creating this as an anchor element for now as per other Leaflet controls such as Zoom, but monitoring the situation for changes e.g. https://github.com/Leaflet/Leaflet/issues/7368
-            this._expandButton = this._createButton('a', this.options.expandButtonContent, this.options.expandButtonTooltip, this.options.expandButtonStyleClass, this._expandButtonContainer, this._expand);
-
-            // Create a button to collapse the user interface - this is displayed underneath the user interface
-            this._createButton('button', this.options.collapseButtonContent, this.options.collapseButtonTooltip, this.options.collapseButtonStyleClass, this._uiContainer, this._collapse);
-
-            // Set the initial expanded state to false. Important: we don't need to set this attribute if the control is always expanded - i.e. this._collapsed == false
-            this._container.setAttribute('aria-expanded', 'false');
-        }
     },
 
     // An amended version of the Leaflet.js function of the same name, (c) 2010-2018 Vladimir Agafonkin, (c) 2010-2011 CloudMade
@@ -320,11 +318,14 @@ L.Control.Reachability = L.Control.extend({
         var button = L.DomUtil.create(tag, className, container);
         button.innerHTML = html;
         button.title = title;
-        if (tag === 'a') button.href = '#';
+
+        if (tag === 'button') button.setAttribute('type', 'button');    // this prevents the button from performing a submit action
+        if (tag === 'a') button.href = 'javascript:void(0)';            // we need an href property otherwise we can't focus with the keyboard despite having tabindex="0", however using href="#" puts the focus at the top of the page
 
         // For assistive technologies e.g. screen readers
-        button.setAttribute('role', 'button');
-		button.setAttribute('aria-label', title);
+        button.setAttribute('aria-label', title);
+        button.setAttribute('tab-index', '0');
+        button.setAttribute('role', 'button');                          // doesn't matter if the element is actually a button, but this helps ensure CSS etc. is consistent if [role="button"] is used as a selector
 
         // Set events
         L.DomEvent
@@ -335,19 +336,19 @@ L.Control.Reachability = L.Control.extend({
 		return button;
 	},
 
+    _expandCollapseToggle: function () {
+        (this._expandCollapseToggleButton.getAttribute('aria-expanded') === 'true') ? this._collapse() : this._expand();
+    },
+
     _expand: function () {
         // Show the user interface container
         L.DomUtil.removeClass(this._uiContainer, 'reachability-control-hide-content');
 
-        // Hide the toggle container
-        L.DomUtil.addClass(this._expandButtonContainer, 'reachability-control-hide-content');
-
         // Remove the active class from the control container if either the draw or delete modes are active
         if (L.DomUtil.hasClass(this._container, this.options.activeStyleClass)) L.DomUtil.removeClass(this._container, this.options.activeStyleClass);
 
-        // Accessibility: set the expanded state of the control container to true and focus on the draw button for ease of keyboard navigation
-        this._container.setAttribute('aria-expanded', 'true');
-        this._drawControl.focus();
+        // Accessibility: set the expanded state of the expand button to true
+        this._expandCollapseToggleButton.setAttribute('aria-expanded', 'true');
 
         // Fire event to inform that the control has been expanded
         this._map.fire('reachability:control_expanded');
@@ -357,15 +358,11 @@ L.Control.Reachability = L.Control.extend({
         // Hide the user interface container
         L.DomUtil.addClass(this._uiContainer, 'reachability-control-hide-content');
 
-        // Show the toggle container
-        L.DomUtil.removeClass(this._expandButtonContainer, 'reachability-control-hide-content');
-
         // Add the active class to the control container if either the draw or delete modes are active
         if ((this._drawMode || this._deleteMode) && !L.DomUtil.hasClass(this._container, this.options.activeStyleClass)) L.DomUtil.addClass(this._container, this.options.activeStyleClass);
 
-        // Accessibility: set the expanded state of the control container to false and focus on the expand button for ease of keyboard navigation
-        this._container.setAttribute('aria-expanded', 'false');
-        this._expandButton.focus();
+        // Accessibility: set the expanded state of the expand button to false
+        this._expandCollapseToggleButton.setAttribute('aria-expanded', 'false');
 
         // Fire event to inform that the control has been collapsed
         this._map.fire('reachability:control_collapsed');
@@ -389,6 +386,9 @@ L.Control.Reachability = L.Control.extend({
         // Set the flag to true and add active class to the draw button to show it's currently selected
         this._drawMode = true;
         L.DomUtil.addClass(this._drawControl, this.options.activeStyleClass);
+
+        // Accessibility: indicate that the draw button has been toggled on
+        this._drawControl.setAttribute('aria-pressed', 'true');
 
         // Deactivate delete mode if currently active
         if (this._deleteMode) this._deactivateDelete();
@@ -436,6 +436,9 @@ L.Control.Reachability = L.Control.extend({
         this._drawMode = false;     // ensure we explicitly set the mode - we may not have come here from a click on the main control
         L.DomUtil.removeClass(this._drawControl, this.options.activeStyleClass);    // remove the selected style
 
+        // Accessibility: indicate that the draw button has been toggled off
+        this._drawControl.setAttribute('aria-pressed', 'false');
+
         // Remove the mouse marker and its events from the map and destroy the marker
         if (this._mouseMarker !== null) {
             this._mouseMarker
@@ -474,6 +477,9 @@ L.Control.Reachability = L.Control.extend({
                 this._deleteMode = true;
                 L.DomUtil.addClass(this._deleteControl, this.options.activeStyleClass);   // add the selected class to the delete button
 
+                // Accessibility: indicate that the delete button has been toggled on
+                this._deleteControl.setAttribute('aria-pressed', 'true');
+
                 // Fire event to inform that the control delete mode has been activated
                 this._map.fire('reachability:delete_activated');
             }
@@ -487,6 +493,9 @@ L.Control.Reachability = L.Control.extend({
     _deactivateDelete: function () {
         this._deleteMode = false;
         L.DomUtil.removeClass(this._deleteControl, this.options.activeStyleClass); // remove the selected class from the delete button
+
+        // Accessibility: indicate that the delete button has been toggled off
+        this._deleteControl.setAttribute('aria-pressed', 'false');
 
         // If collapsed == true, remove the active class from the collapsed control
         if (L.DomUtil.hasClass(this._container, this.options.activeStyleClass)) L.DomUtil.removeClass(this._container, this.options.activeStyleClass);
