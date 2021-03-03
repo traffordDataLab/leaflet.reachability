@@ -52,6 +52,20 @@
             {
                 font-size: 22px;
             }
+
+            /* Create an alternate 'icon' for the expand/collapse button when the UI is expanded
+               Credit: GolezTrol - https://stackoverflow.com/questions/27492191/how-to-make-a-chevron-arrow-using-css */
+            .leaflet-bar a.reachability-control-expand-collapse-button[aria-expanded="true"]::before
+            {
+                position: relative;
+                content: "";
+                display: inline-block;
+                width: 0.3em;
+                height: 0.3em;
+                border-right: 0.15em solid;
+                border-top: 0.15em solid;
+                transform: rotate(-45deg);
+            }
         </style>
     </head>
 
@@ -131,10 +145,8 @@
                 mouseOutFn: resetIsolines,
                 clickFn: clickIsolines,
                 markerFn: isolinesOrigin,
-                expandButtonContent: '',
-                expandButtonStyleClass: 'reachability-control-expand-button fa fa-bullseye',
-                collapseButtonContent: '',
-                collapseButtonStyleClass: 'reachability-control-collapse-button fa fa-caret-up',
+                expandCollapseButtonContent: '',
+                expandCollapseButtonStyleClass: 'reachability-control-expand-collapse-button fa fa-bullseye',
                 drawButtonContent: '',
                 drawButtonStyleClass: 'fa fa-pencil',
                 deleteButtonContent: '',

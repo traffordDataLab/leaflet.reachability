@@ -1,5 +1,25 @@
 # leaflet.reachability Changelog
 
+## 3.0.0 (TBC)
+This is a new major version release and so contains breaking changes compared to previous versions. Changes all relate to improving accessibility, no new features have been added.
+
+- Made the anchor 'button' to expand the reachability interface (if collapsed === true) into a toggle button to expand/collapse and removed the former collapse button. This allows the focus to remain on the button when activated and makes the control more understandable. Also added features allowing it to be activated using space and enter like an actual `<button>` element. Changes affected are as follows:<br />
+**Removed the following parameters**:<br />
+`expandButtonContent`, `expandButtonStyleClass`, `expandButtonTooltip`, `collapseButtonContent`, `collapseButtonStyleClass`, `collapseButtonTooltip`<br />
+**Added the following parameters**:<br />
+`expandCollapseButtonContent`, `expandCollapseButtonStyleClass`, `expandCollapseButtonTooltip`<br />
+**Removed the following CSS classes**:<br />
+`.reachability-control-expand-button`, `.reachability-control-collapse-button`<br />
+**Added the following CSS classes**:<br />
+`.reachability-control-expand-collapse-button`<br />
+
+- Changed all buttons in the user interface to `<button>` elements rather than `<span>`. Aside from being the correct element to use, this means that the buttons can now be interacted with via the keyboard. This required changes to the following CSS classes which could cause issues with previous implementations:<br />
+`.reachability-control-settings-button`<br />
+`.reachability-control-collapse-button`
+- Changed the titles for the distance and time range select lists from <span> elements into <label> elements associated to the select lists. Updated naming of the following parameters accordingly:<br />
+`rangeControlDistanceTitle` is now `rangeControlDistanceLabel`<br />
+`rangeControlTimeTitle` is now `rangeControlTimeLabel`<br />
+
 ## 2.0.1 (2020-11-27)
 Minor update to the attribution in accordance with the [OpenRouteService updated terms of service](https://openrouteservice.org/terms-of-service/).
 

@@ -1,20 +1,20 @@
-/* Button to expand the reachability control when in a toggleable state */
-.reachability-control-expand-button
+/* Button to expand/collapse the reachability control UI when in a toggleable state (collapsed == true) */
+.reachability-control-expand-collapse-button
 {
     font-size: 18px;
     font-weight: bold;
 }
-.leaflet-touch .reachability-control-expand-button
+.leaflet-touch .reachability-control-expand-collapse-button
 {
     font-size: 22px;
 }
 /* We need to specify the ".leaflet-bar a" class and selector specifically for the following in order to override the default Leaflet control styles */
-.leaflet-bar a.reachability-control-expand-button
+.leaflet-bar a.reachability-control-expand-collapse-button
 {
     min-width: 100%;    /* makes the button fill the width of the UI container when in expanded state */
 }
-.leaflet-bar a.reachability-control-expand-button[aria-expanded="false"],
-.leaflet-bar a.reachability-control-expand-button[aria-expanded="false"]:hover
+.leaflet-bar a.reachability-control-expand-collapse-button[aria-expanded="false"],
+.leaflet-bar a.reachability-control-expand-collapse-button[aria-expanded="false"]:hover
 {
     border-bottom: none;                /* removes the border when the UI is collapsed - even though the UI is is hidden, the button is still the 'first-child' element in the control so Leaflet adds a border */
     border-bottom-left-radius: 4px;     /* for a similar reason, as it's not the last child... */
@@ -29,7 +29,7 @@
     border-radius: 4px;
 }
 /* Remove the rounded corners at the top of the UI if the show/hide button is above it, i.e. collapsed = true */
-a.reachability-control-expand-button + div.reachability-control-settings-container
+a.reachability-control-expand-collapse-button + div.reachability-control-settings-container
 {
     border-top-left-radius: 0px;
     border-top-right-radius: 0px;
@@ -51,7 +51,7 @@ a.reachability-control-expand-button + div.reachability-control-settings-contain
 {
     margin-right: 0px;
 }
-.reachability-control-settings-button, .reachability-control-expand-button, .reachability-control-collapse-button
+.reachability-control-settings-button, .reachability-control-expand-collapse-button
 {
     cursor: pointer;
 }
