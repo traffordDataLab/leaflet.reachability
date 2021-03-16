@@ -183,6 +183,7 @@ L.Control.Reachability = L.Control.extend({
 
         // Delete button - to remove isolines
         this._deleteControl = this._createButton('button', this.options.deleteButtonContent, this.options.deleteButtonTooltip, this.options.settingsButtonStyleClass + ' ' + this.options.deleteButtonStyleClass, this._actionsAndModesContainer, this._toggleDelete);
+        this._deleteControl.setAttribute('aria-pressed', 'false') // Accessibility: indicate that the button is not currently pressed
 
         // Distance setting button - to calculate isolines based on distance (isodistance)
         this._distanceControl = this._createButton('button', this.options.distanceButtonContent, this.options.distanceButtonTooltip, this.options.settingsButtonStyleClass + ' ' + this.options.distanceButtonStyleClass, this._actionsAndModesContainer, this._setRangeByDistance);
