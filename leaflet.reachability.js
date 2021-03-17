@@ -179,11 +179,12 @@ L.Control.Reachability = L.Control.extend({
 
         // Draw button - to create isolines
         this._drawControl = this._createButton('button', this.options.drawButtonContent, this.options.drawButtonTooltip, this.options.settingsButtonStyleClass + ' ' + this.options.drawButtonStyleClass, this._actionsAndModesContainer, this._toggleDraw);
-        this._drawControl.setAttribute('aria-pressed', 'false') // Accessibility: indicate that the button is not currently pressed
+        this._drawControl.setAttribute('aria-pressed', 'false'); // Accessibility: indicate that the button is not currently pressed
 
         // Delete button - to remove isolines
         this._deleteControl = this._createButton('button', this.options.deleteButtonContent, this.options.deleteButtonTooltip, this.options.settingsButtonStyleClass + ' ' + this.options.deleteButtonStyleClass, this._actionsAndModesContainer, this._toggleDelete);
-        this._deleteControl.setAttribute('aria-pressed', 'false') // Accessibility: indicate that the button is not currently pressed
+        this._deleteControl.setAttribute('aria-pressed', 'false');  // Accessibility: indicate that the button is not currently pressed
+        this._deleteControl.setAttribute('disabled', '');           // The button is currently not available as there are no reachability areas displayed on the map to delete
 
         // Distance setting button - to calculate isolines based on distance (isodistance)
         this._distanceControl = this._createButton('button', this.options.distanceButtonContent, this.options.distanceButtonTooltip, this.options.settingsButtonStyleClass + ' ' + this.options.distanceButtonStyleClass, this._actionsAndModesContainer, this._setRangeByDistance);
@@ -468,6 +469,9 @@ L.Control.Reachability = L.Control.extend({
                 this.isolinesGroup.clearLayers();
                 this.isolinesGroup.removeFrom(this._map);
 
+                // prevent the button from being activated again until another reachability area is displayed on the map
+                this._deleteControl.setAttribute('disabled', '');
+
                 // Inform that an isoline FeatureGroup has been deleted
                 this._map.fire('reachability:delete');
             }
@@ -484,8 +488,9 @@ L.Control.Reachability = L.Control.extend({
             }
         }
         else {
-            // There are no isoline groups to delete so warn the user by flashing the button
-            this._showError(this._deleteControl);
+            // As of v3.0.0 this should not happen as the 'disabled' attribute should be set on the delete button if no reachability areas exist on the map, preventing the user from activating it.
+            // Ensure the 'diabled' attribute is set. TODO: log the error
+            this._deleteControl.setAttribute('disabled', '');
         }
     },
 
@@ -515,6 +520,7 @@ L.Control.Reachability = L.Control.extend({
         // Deactivate the delete control and remove the isolines group from the map if there are no more isoline groups left
         if (this.isolinesGroup.getLayers().length == 0) {
             this._deactivateDelete();
+            this._deleteControl.setAttribute('disabled', '');   // prevent the button from being activated again until another reachability area is displayed on the map
             this.isolinesGroup.removeFrom(this._map);
         }
 
@@ -859,6 +865,9 @@ L.Control.Reachability = L.Control.extend({
 
                                 // Add the isolines GeoJSON FeatureGroup to the map if it isn't already
                                 if (!context._map.hasLayer(context.isolinesGroup)) context.isolinesGroup.addTo(context._map);
+
+                                // Allow the delete button to be activated by removing the 'disabled' attribute if it is currently set
+                                if (context._deleteControl.hasAttribute('disabled')) context._deleteControl.removeAttribute('disabled')
 
                                 // Fire event to inform that isolines have been drawn successfully
                                 context._map.fire('reachability:displayed');

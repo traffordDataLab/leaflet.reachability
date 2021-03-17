@@ -38,7 +38,7 @@ a.reachability-control-expand-collapse-button + div.reachability-control-setting
 /* General class for styling the 'button' controls in the user interface container */
 .reachability-control-settings-button
 {
-    color: #757575;
+    color: #505050;
     background-color: transparent;
     width: 42px;
     height: 42px;
@@ -57,7 +57,15 @@ a.reachability-control-expand-collapse-button + div.reachability-control-setting
 }
 .reachability-control-settings-button:hover
 {
-    background-color: #f4f4f4;
+    color: #0359A0;
+    border-color: #0073d4;
+}
+button.reachability-control-settings-button:disabled
+{
+    color: #696969;
+    background-color: #f0f0f0;
+    border-color: #ccc;
+    cursor: default;
 }
 
 /* Dividers between the different UI sections */
@@ -73,7 +81,7 @@ a.reachability-control-expand-collapse-button + div.reachability-control-setting
 .reachability-control-active, .leaflet-touch .reachability-control-active, .reachability-control-active a, .leaflet-touch .reachability-control-active a
 {
     border-color: #0073d4;
-    color: #0073d4;
+    color: #0359A0;
     box-shadow: 0 1px 5px rgba(0,115,212,0.65);
 }
 
