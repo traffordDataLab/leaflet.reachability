@@ -13,12 +13,13 @@ This is a new major version release and so contains breaking changes compared to
 **Added the following CSS classes**:<br />
 `.reachability-control-expand-collapse-button`<br />
 
-- Changed all buttons in the user interface to `<button>` elements rather than `<span>`. Aside from being the correct element to use, this means that the buttons can now be interacted with via the keyboard. This required changes to the following CSS classes which could cause issues with previous implementations:<br />
+- Changed all buttons in the user interface to `<button>` elements rather than using `<span>`. All user interface buttons can now be interacted with via the keyboard using space and enter keys. This required changes to the following CSS classes which could cause issues with previous implementations:<br />
 `.reachability-control-settings-button`<br />
 `.reachability-control-collapse-button`
 - Changed the titles for the distance and time range select lists from <span> elements into <label> elements associated to the select lists. Updated naming of the following parameters accordingly:<br />
 `rangeControlDistanceTitle` is now `rangeControlDistanceLabel`<br />
-`rangeControlTimeTitle` is now `rangeControlTimeLabel`<br />
+`rangeControlTimeTitle` is now `rangeControlTimeLabel`
+- Delete button has `disabled` attribute set when there are no reachability areas on the map
 
 ## 2.0.1 (2020-11-27)
 Minor update to the attribution in accordance with the [OpenRouteService updated terms of service](https://openrouteservice.org/terms-of-service/).
