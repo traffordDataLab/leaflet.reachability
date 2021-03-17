@@ -11,15 +11,16 @@ This is a new major version release and so contains breaking changes compared to
 **Removed the following CSS classes**:<br />
 `.reachability-control-expand-button`, `.reachability-control-collapse-button`<br />
 **Added the following CSS classes**:<br />
-`.reachability-control-expand-collapse-button`<br />
-
+`.reachability-control-expand-collapse-button`
 - Changed all buttons in the user interface to `<button>` elements rather than using `<span>`. All user interface buttons can now be interacted with via the keyboard using space and enter keys. This required changes to the following CSS classes which could cause issues with previous implementations:<br />
-`.reachability-control-settings-button`<br />
-`.reachability-control-collapse-button`
-- Changed the titles for the distance and time range select lists from <span> elements into <label> elements associated to the select lists. Updated naming of the following parameters accordingly:<br />
-`rangeControlDistanceTitle` is now `rangeControlDistanceLabel`<br />
+`.reachability-control-settings-button`, `.reachability-control-collapse-button`
+- Changed the titles for the distance and time range select lists from `<span>` elements into `<label>` elements associated to the select lists. Updated naming of the following parameters accordingly:<br />
+`rangeControlDistanceTitle` is now `rangeControlDistanceLabel`
 `rangeControlTimeTitle` is now `rangeControlTimeLabel`
 - Delete button has `disabled` attribute set when there are no reachability areas on the map
+- Added `title` (tooltips) and `aria-label` attributes to the distance, time and intervals `<label>`s to give further information on their function:<br />
+**Added the following parameters**:<br />
+`rangeControlDistanceLabelTooltip`, `rangeControlTimeLabelTooltip`, `rangeIntervalsLabelTooltip`<br />
 
 ## 2.0.1 (2020-11-27)
 Minor update to the attribution in accordance with the [OpenRouteService updated terms of service](https://openrouteservice.org/terms-of-service/).

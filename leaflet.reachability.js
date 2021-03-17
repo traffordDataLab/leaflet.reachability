@@ -67,19 +67,22 @@ L.Control.Reachability = L.Control.extend({
         travelModeButton4Tooltip: 'Travel mode: wheelchair',
 
         // Control for the range parameter
-        rangeControlDistanceLabel: 'Dist.',
-        rangeControlDistance: null,                     // Custom range specified as an array which supersedes rangeControlDistanceMax and rangeControlDistanceInterval if not null
-        rangeControlDistanceMax: 3,
-        rangeControlDistanceInterval: 0.5,
-        rangeControlDistanceUnits: 'km',                // Can be either 'm', 'km' or 'mi'
+        rangeControlDistanceLabel: 'Dist.',                         // The label associated with the distance select list
+        rangeControlDistanceLabelTooltip: 'Reachability distance',  // A fuller and more descriptive version of the label displayed as a tooltip and also used as the aria-label for screen readers
+        rangeControlDistance: null,                                 // Custom range specified as an array which supersedes rangeControlDistanceMax and rangeControlDistanceInterval if not null
+        rangeControlDistanceMax: 3,                                 // Maximum distance option in the select list
+        rangeControlDistanceInterval: 0.5,                          // Interval between the distance options displayed in the select list
+        rangeControlDistanceUnits: 'km',                            // Unit for the distance, either 'm' for metres, 'km' for kilometres or 'mi' for miles
 
         rangeControlTimeLabel: 'Time',
-        rangeControlTime: null,                         // \  Custom range specified as an array which supersedes rangeControlTimeMax and rangeControlTimeInterval if not null
-        rangeControlTimeMax: 30,                        //  > All these values will be multiplied by 60 to convert to seconds - no other unit of time is allowed
-        rangeControlTimeInterval: 5,                    // /
+        rangeControlTimeLabelTooltip: 'Reachability time',  // Same as the one for distance
+        rangeControlTime: null,                             // \  Custom range specified as an array which supersedes rangeControlTimeMax and rangeControlTimeInterval if not null
+        rangeControlTimeMax: 30,                            //  > All these values will be multiplied by 60 to convert to seconds - no other unit of time is allowed
+        rangeControlTimeInterval: 5,                        // /
 
         rangeTypeDefault: 'time',                       // Range can be either distance or time - any value other than 'distance' passed to the API is assumed to be 'time'
-        rangeIntervalsLabel: 'intervals',               // The 'show intervals?' checkbox label
+        rangeIntervalsLabel: 'intervals',               // The label associated to the intervals checkbox
+        rangeIntervalsLabelTooltip: 'Show reachability for intervals up to and including the selected value',  // A fuller description of the intervals checkbox displayed as a tooltip and also used as the aria-label for screen readers
 
         // API settings
         apiKey: '',                                     // openrouteservice API key - the service which returns the isoline polygons based on the various options/parameters
@@ -173,24 +176,23 @@ L.Control.Reachability = L.Control.extend({
         if (this._collapsed) L.DomUtil.addClass(this._uiContainer, 'reachability-control-hide-content');    // Hide the UI initially as the control is in the collapsed state
         this._container.appendChild(this._uiContainer);
 
-        // Container for the action and mode buttons
-        this._actionsAndModesContainer = L.DomUtil.create('div', 'reachability-control-settings-block-container', this._uiContainer);
-
+        // Container for the draw and delete action buttons and the time and distance method buttons
+        this._actionsAndMethodContainer = L.DomUtil.create('div', 'reachability-control-settings-block-container', this._uiContainer);
 
         // Draw button - to create isolines
-        this._drawControl = this._createButton('button', this.options.drawButtonContent, this.options.drawButtonTooltip, this.options.settingsButtonStyleClass + ' ' + this.options.drawButtonStyleClass, this._actionsAndModesContainer, this._toggleDraw);
+        this._drawControl = this._createButton('button', this.options.drawButtonContent, this.options.drawButtonTooltip, this.options.settingsButtonStyleClass + ' ' + this.options.drawButtonStyleClass, this._actionsAndMethodContainer, this._toggleDraw);
         this._drawControl.setAttribute('aria-pressed', 'false'); // Accessibility: indicate that the button is not currently pressed
 
         // Delete button - to remove isolines
-        this._deleteControl = this._createButton('button', this.options.deleteButtonContent, this.options.deleteButtonTooltip, this.options.settingsButtonStyleClass + ' ' + this.options.deleteButtonStyleClass, this._actionsAndModesContainer, this._toggleDelete);
+        this._deleteControl = this._createButton('button', this.options.deleteButtonContent, this.options.deleteButtonTooltip, this.options.settingsButtonStyleClass + ' ' + this.options.deleteButtonStyleClass, this._actionsAndMethodContainer, this._toggleDelete);
         this._deleteControl.setAttribute('aria-pressed', 'false');  // Accessibility: indicate that the button is not currently pressed
         this._deleteControl.setAttribute('disabled', '');           // The button is currently not available as there are no reachability areas displayed on the map to delete
 
         // Distance setting button - to calculate isolines based on distance (isodistance)
-        this._distanceControl = this._createButton('button', this.options.distanceButtonContent, this.options.distanceButtonTooltip, this.options.settingsButtonStyleClass + ' ' + this.options.distanceButtonStyleClass, this._actionsAndModesContainer, this._setRangeByDistance);
+        this._distanceControl = this._createButton('button', this.options.distanceButtonContent, this.options.distanceButtonTooltip, this.options.settingsButtonStyleClass + ' ' + this.options.distanceButtonStyleClass, this._actionsAndMethodContainer, this._setRangeByDistance);
 
         // Time setting button - to calculate isolines based on time (isochrones)
-        this._timeControl = this._createButton('button', this.options.timeButtonContent, this.options.timeButtonTooltip, this.options.settingsButtonStyleClass + ' ' + this.options.timeButtonStyleClass, this._actionsAndModesContainer, this._setRangeByTime);
+        this._timeControl = this._createButton('button', this.options.timeButtonContent, this.options.timeButtonTooltip, this.options.settingsButtonStyleClass + ' ' + this.options.timeButtonStyleClass, this._actionsAndMethodContainer, this._setRangeByTime);
 
 
         // Container for the travel mode buttons
@@ -212,6 +214,8 @@ L.Control.Reachability = L.Control.extend({
         // Distance range title
         this._rangeDistanceLabel = L.DomUtil.create('label', 'reachability-control-range-title reachability-control-hide-content', this._uiContainer);
         this._rangeDistanceLabel.setAttribute('for', 'rangeDistanceSelect');
+        this._rangeDistanceLabel.setAttribute('title', this.options.rangeControlDistanceLabelTooltip);
+        this._rangeDistanceLabel.setAttribute('aria-label', this.options.rangeControlDistanceLabelTooltip);
         this._rangeDistanceLabel.innerHTML = this.options.rangeControlDistanceLabel;
 
         // Distance range control
@@ -242,6 +246,8 @@ L.Control.Reachability = L.Control.extend({
         // Time range title
         this._rangeTimeLabel = L.DomUtil.create('label', 'reachability-control-range-title reachability-control-hide-content', this._uiContainer);
         this._rangeTimeLabel.setAttribute('for', 'rangeTimeSelect');
+        this._rangeTimeLabel.setAttribute('title', this.options.rangeControlTimeLabelTooltip);
+        this._rangeTimeLabel.setAttribute('aria-label', this.options.rangeControlTimeLabelTooltip);
         this._rangeTimeLabel.innerHTML = this.options.rangeControlTimeLabel;
 
         // Time range control
@@ -280,6 +286,8 @@ L.Control.Reachability = L.Control.extend({
         this._showInterval.setAttribute('type', 'checkbox');
         this._showIntervalLabel = L.DomUtil.create('label', '', this._showIntervalContainer);
         this._showIntervalLabel.setAttribute('for', 'rangeInterval');
+        this._showIntervalLabel.setAttribute('title', this.options.rangeIntervalsLabelTooltip);
+        this._showIntervalLabel.setAttribute('aria-label', this.options.rangeIntervalsLabelTooltip);
         this._showIntervalLabel.innerHTML = this.options.rangeIntervalsLabel;
 
 
@@ -305,10 +313,10 @@ L.Control.Reachability = L.Control.extend({
         // Create a control button
         var button = L.DomUtil.create(tag, className, container);
         button.innerHTML = html;
-        button.title = title;
+        button.title = title;   // tooltip
 
         // For accessibility
-        button.setAttribute('aria-label', title);
+        button.setAttribute('aria-label', title);   // uses the same content as the tooltip
         button.setAttribute('tabindex', '0');       // this allows the element if it is not a <button> to be focussable - especially important if it is an anchor as we are not setting the href property, see: https://github.com/Leaflet/Leaflet/issues/7368
         button.setAttribute('role', 'button');      // doesn't matter if the element is actually a button, but this helps ensure CSS etc. is consistent if [role="button"] is used as a selector
 
@@ -489,7 +497,7 @@ L.Control.Reachability = L.Control.extend({
         }
         else {
             // As of v3.0.0 this should not happen as the 'disabled' attribute should be set on the delete button if no reachability areas exist on the map, preventing the user from activating it.
-            // Ensure the 'diabled' attribute is set. TODO: log the error
+            // Ensure the 'disabled' attribute is set to prevent this happening again.
             this._deleteControl.setAttribute('disabled', '');
         }
     },
