@@ -7,13 +7,13 @@ This is a new major version release and so contains breaking changes compared to
 **Removed the following parameters**:<br />
 `expandButtonContent`, `expandButtonStyleClass`, `expandButtonTooltip`, `collapseButtonContent`, `collapseButtonStyleClass`, `collapseButtonTooltip`<br />
 **Added the following parameters**:<br />
-`expandCollapseButtonContent`, `expandCollapseButtonStyleClass`, `expandCollapseButtonTooltip`<br />
+`toggleButtonContent`, `toggleButtonStyleClass`, `toggleButtonTooltip`<br />
 **Removed the following CSS classes**:<br />
 `.reachability-control-expand-button`, `.reachability-control-collapse-button`<br />
 **Added the following CSS classes**:<br />
-`.reachability-control-expand-collapse-button`
-- Changed all buttons in the user interface to `<button>` elements rather than using `<span>`. All user interface buttons can now be interacted with via the keyboard using space and enter keys. This required changes to the following CSS classes which could cause issues with previous implementations:<br />
-`.reachability-control-settings-button`, `.reachability-control-collapse-button`
+`.reachability-control-toggle-button`
+- Changed all buttons in the user interface to `<button>` elements rather than using `<span>`. All user interface buttons can now be interacted with via the keyboard using space and enter keys. Additionally the distance, time and travel mode buttons have all been given `'radio'` aria roles as they function like radio buttons. This required changes to the following CSS classes which could cause issues with previous implementations:<br />
+`.reachability-control-settings-button`, `.reachability-control-active`
 - Changed the titles for the distance and time range select lists from `<span>` elements into `<label>` elements associated to the select lists. Updated naming of the following parameters accordingly:<br />
 `rangeControlDistanceTitle` is now `rangeControlDistanceLabel`
 `rangeControlTimeTitle` is now `rangeControlTimeLabel`
