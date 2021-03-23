@@ -20,6 +20,7 @@ L.Control.Reachability = L.Control.extend({
         drawActiveMouseClass: 'leaflet-crosshair',                                      // CSS class applied to the mouse pointer when the plugin is in draw mode
 
         // The containing div to hold the actual user interface controls
+        settingsContainerTooltip: 'Settings to create areas of reachability',           // Tooltip and aria-label to explain the purpose of the plugin UI
         settingsContainerStyleClass: 'reachability-control-settings-container',         // The container holding the user interface controls which is displayed if collapsed is false, or when the user expands the control by clicking on the expand button
         settingsButtonStyleClass: 'reachability-control-settings-button',               // Generic class to style the setting buttons uniformly - further customisation per button is available with specific options below
         activeStyleClass: 'reachability-control-active',                                // Indicate to the user which button is active in the settings and the collapsed state of the control if settings are active
@@ -41,7 +42,7 @@ L.Control.Reachability = L.Control.extend({
         deleteButtonTooltip: 'Delete reachability',
 
         // Isoline calculation mode - either distance or time
-        methodLabel: '',
+        methodTooltip: 'Calculation method options',
 
         distanceButtonContent: 'dst',
         distanceButtonStyleClass: '',
@@ -52,7 +53,7 @@ L.Control.Reachability = L.Control.extend({
         timeButtonTooltip: 'Reachability based on time',
 
         // Travel modes
-        travelModesLabel: 'Travel mode options',                    // Tooltip and aria-label for the travel modes container div. Required to enable radio button-like functionality
+        travelModesTooltip: 'Travel mode options',                    // Tooltip and aria-label for the travel modes container div. Required to enable radio button-like functionality
 
         travelModeButton1Content: 'car',
         travelModeButton1StyleClass: '',
@@ -177,6 +178,8 @@ L.Control.Reachability = L.Control.extend({
 
         // Container for the user interface controls - these will be displayed permanently if the collapsed option is false, otherwise when the user clicks on the collapsed control toggle button
         this._uiContainer = L.DomUtil.create('div', this.options.settingsContainerStyleClass);
+        this._uiContainer.setAttribute('title', this.options.settingsContainerTooltip);         // Describes the purpose of the control's UI...
+        this._uiContainer.setAttribute('aria-label', this.options.settingsContainerTooltip);    // ...Also acts as a grouping to allow screen readers to announce the start and end of the UI
         if (this._collapsed) L.DomUtil.addClass(this._uiContainer, 'reachability-control-hide-content');    // Hide the UI initially as the control is in the collapsed state
         this._container.appendChild(this._uiContainer);
 
@@ -185,7 +188,7 @@ L.Control.Reachability = L.Control.extend({
 
         // Draw button - to create isolines
         this._drawControl = this._createButton('button', this.options.drawButtonContent, this.options.drawButtonTooltip, 'button', this.options.settingsButtonStyleClass + ' ' + this.options.drawButtonStyleClass, this._actionsAndMethodContainer, this._toggleDraw);
-        this._drawControl.setAttribute('aria-pressed', 'false'); // Accessibility: indicate that the button is not currently pressed
+        this._drawControl.setAttribute('aria-pressed', 'false');    // Accessibility: indicate that the button is not currently pressed
 
         // Delete button - to remove isolines
         this._deleteControl = this._createButton('button', this.options.deleteButtonContent, this.options.deleteButtonTooltip, 'button', this.options.settingsButtonStyleClass + ' ' + this.options.deleteButtonStyleClass, this._actionsAndMethodContainer, this._toggleDelete);
@@ -202,8 +205,8 @@ L.Control.Reachability = L.Control.extend({
         // Container for the travel mode buttons
         this._modesContainer = L.DomUtil.create('div', 'reachability-control-settings-block-container', this._uiContainer);
         this._modesContainer.setAttribute('role', 'radiogroup');    // Accessibility: to allow the travel mode buttons to act like a radio button group
-        this._modesContainer.setAttribute('aria-label', this.options.travelModesLabel); // Describes the purpose of the group of buttons to screen readers...
-        this._modesContainer.setAttribute('title', this.options.travelModesLabel);      // ...and via tooltip
+        this._modesContainer.setAttribute('aria-label', this.options.travelModesTooltip); // Describes the purpose of the group of buttons to screen readers...
+        this._modesContainer.setAttribute('title', this.options.travelModesTooltip);      // ...and via tooltip
 
         // Travel mode 1 button - this is the only required button as there has to be at least one mode of travel to query the API
         this._travelMode1Control = this._createButton('button', this.options.travelModeButton1Content, this.options.travelModeButton1Tooltip, 'radio', this.options.settingsButtonStyleClass + ' ' + this.options.travelModeButton1StyleClass, this._modesContainer, function(){this._setTravelMode(this.options.travelModeProfile1)});
