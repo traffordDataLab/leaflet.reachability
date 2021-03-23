@@ -1,20 +1,19 @@
 /* Button to expand/collapse the reachability control UI when in a toggleable state (collapsed == true) */
-.reachability-control-expand-collapse-button
+.reachability-control-toggle-button
 {
     font-size: 18px;
     font-weight: bold;
 }
-.leaflet-touch .reachability-control-expand-collapse-button
+.leaflet-touch .reachability-control-toggle-button
 {
     font-size: 22px;
 }
-/* We need to specify the ".leaflet-bar a" class and selector specifically for the following in order to override the default Leaflet control styles */
-.leaflet-bar a.reachability-control-expand-collapse-button
+.leaflet-bar a.reachability-control-toggle-button  /* We need to specify the ".leaflet-bar a" class and selector specifically for the following in order to override the default Leaflet control styles */
 {
     min-width: 100%;    /* makes the button fill the width of the UI container when in expanded state */
 }
-.leaflet-bar a.reachability-control-expand-collapse-button[aria-expanded="false"],
-.leaflet-bar a.reachability-control-expand-collapse-button[aria-expanded="false"]:hover
+.leaflet-bar a.reachability-control-toggle-button[aria-expanded="false"],
+.leaflet-bar a.reachability-control-toggle-button[aria-expanded="false"]:hover
 {
     border-bottom: none;                /* removes the border when the UI is collapsed - even though the UI is is hidden, the button is still the 'first-child' element in the control so Leaflet adds a border */
     border-bottom-left-radius: 4px;     /* for a similar reason, as it's not the last child... */
@@ -28,8 +27,7 @@
     padding: 10px 6px 6px 6px;
     border-radius: 4px;
 }
-/* Remove the rounded corners at the top of the UI if the show/hide button is above it, i.e. collapsed = true */
-a.reachability-control-expand-collapse-button + div.reachability-control-settings-container
+a.reachability-control-toggle-button + div.reachability-control-settings-container /* Remove the rounded corners at the top of the UI if the show/hide button is above it, i.e. collapsed = true */
 {
     border-top-left-radius: 0px;
     border-top-right-radius: 0px;
@@ -51,7 +49,7 @@ a.reachability-control-expand-collapse-button + div.reachability-control-setting
 {
     margin-right: 0px;
 }
-.reachability-control-settings-button, .reachability-control-expand-collapse-button
+.reachability-control-settings-button, .reachability-control-toggle-button
 {
     cursor: pointer;
 }
@@ -60,7 +58,7 @@ a.reachability-control-expand-collapse-button + div.reachability-control-setting
     color: #0359A0;
     border-color: #0073d4;
 }
-button.reachability-control-settings-button:disabled
+.reachability-control-settings-button:disabled
 {
     color: #696969;
     background-color: #f0f0f0;
@@ -82,14 +80,14 @@ button.reachability-control-settings-button:disabled
 .leaflet-touch .reachability-control-active,
 .reachability-control-active a,
 .leaflet-touch .reachability-control-active a,
-[aria-checked="true"].reachability-control-settings-button
+[aria-checked="true"].reachability-control-settings-button  /* This is specifically for the radio-style buttons: distance, time and travel modes */
 {
     border-color: #0073d4;
     color: #0359A0;
     box-shadow: 0 1px 5px rgba(0,115,212,0.65);
 }
 
-/* If something has gone wrong or the user tries to perform an action that isn't allowed e.g. trying to delete when there are no isolines */
+/* If something has gone wrong e.g. bad call to the API etc. */
 .reachability-control-error, .leaflet-touch .reachability-control-error
 {
     border-color: red;

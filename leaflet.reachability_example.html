@@ -53,9 +53,11 @@
                 font-size: 22px;
             }
 
-            /* Create an alternate 'icon' for the expand/collapse button when the UI is expanded
-               Credit: GolezTrol - https://stackoverflow.com/questions/27492191/how-to-make-a-chevron-arrow-using-css */
-            .leaflet-bar a.reachability-control-expand-collapse-button[aria-expanded="true"]::before
+            /* Example for how to create an alternate 'icon' for the expand/collapse toggle button when the UI is expanded
+               Credit: GolezTrol - https://stackoverflow.com/questions/27492191/how-to-make-a-chevron-arrow-using-css
+               Change the rotate parameter to make the chevron point in different directions - could relate to where you place the control on the map:
+               Left: -135deg, Right: 45deg, Up: -45deg, Down: 135deg */
+            .leaflet-bar a.reachability-control-toggle-button[aria-expanded="true"]::before
             {
                 position: relative;
                 content: "";
@@ -125,7 +127,6 @@
                 return L.circleMarker(latLng, { radius: 4, weight: 2, color: '#0073d4', fillColor: '#fff', fillOpacity: 1 });
             }
 
-
             // Create the Leaflet map object
             var map = L.map('map', { center: [53.4189, -2.33], zoom: 12, minZoom: 10, zoomDelta: 0.25, zoomSnap: 0 });
 
@@ -136,7 +137,7 @@
             	maxZoom: 19
             }).addTo(map);
 
-            // Add the reachability plugin
+            // Add the reachability plugin and customise using Font Awesome icons
             var reachabilityControl = L.control.reachability({
                 // add settings here
                 apiKey: '5b3ce3597851110001cf6248c9f85cae50384963b985be5b9d179444', // PLEASE REGISTER WITH OPENROUTESERVICE FOR YOUR OWN KEY!
@@ -145,8 +146,8 @@
                 mouseOutFn: resetIsolines,
                 clickFn: clickIsolines,
                 markerFn: isolinesOrigin,
-                expandCollapseButtonContent: '',
-                expandCollapseButtonStyleClass: 'reachability-control-expand-collapse-button fa fa-bullseye',
+                toggleButtonContent: '',
+                toggleButtonStyleClass: 'reachability-control-toggle-button fa fa-bullseye',
                 drawButtonContent: '',
                 drawButtonStyleClass: 'fa fa-pencil',
                 deleteButtonContent: '',

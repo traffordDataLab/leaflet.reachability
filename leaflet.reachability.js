@@ -1,6 +1,6 @@
 /*
     Created:        2018-06-12 by James Austin - Trafford Data Lab https://www.trafforddatalab.io | https://github.com/trafforddatalab
-    Latest update:  2021-01-08
+    Latest update:  2021-03-23
     Purpose:        Uses openrouteservice API to create isolines showing areas within reach of certain travel times based on different modes of travel or distance. See https://wiki.openstreetmap.org/wiki/Isochrone for more information
     Dependencies:   Leaflet.js (external library), openrouteservice.org API (requires a key - free service available via registration)
     Licence:        https://github.com/traffordDataLab/leaflet.reachability/blob/master/LICENSE
@@ -10,26 +10,26 @@
 L.Control.Reachability = L.Control.extend({
     options: {
         // Leaflet positioning options
-        position: 'topleft',                                                            // Leaflet control pane position
-        pane: 'overlayPane',                                                            // Leaflet pane to add the isolines GeoJSON to
-        zIndexMouseMarker: 9000,                                                        // Needs to be greater than any other layer in the map - this is an invisible marker tied to the mouse pointer when the control is activated to prevent clicks interacting with other map objects
+        position: 'topleft',                                                    // Leaflet control pane position
+        pane: 'overlayPane',                                                    // Leaflet pane to add the isolines GeoJSON to
+        zIndexMouseMarker: 9000,                                                // Needs to be greater than any other layer in the map - this is an invisible marker tied to the mouse pointer when the control is activated to prevent clicks interacting with other map objects
 
         // Main control settings and styling
-        collapsed: true,                                                                // Operates in a similar way to the Leaflet layer control - can be collapsed into a standard single control which expands on-click (true) or is displayed fully expanded (false)
-        controlContainerStyleClass: '',                                                 // The container for the plugin control will usually be styled with the standard Leaflet control styling, however this option allows for customisation
-        drawActiveMouseClass: 'leaflet-crosshair',                                      // CSS class applied to the mouse pointer when the plugin is in draw mode
+        collapsed: true,                                                        // Operates in a similar way to the Leaflet layer control - can be collapsed into a standard single control which expands on-click (true) or is displayed fully expanded (false)
+        controlContainerStyleClass: '',                                         // The container for the plugin control will usually be styled with the standard Leaflet control styling, however this option allows for customisation
+        drawActiveMouseClass: 'leaflet-crosshair',                              // CSS class applied to the mouse pointer when the plugin is in draw mode
 
         // The containing div to hold the actual user interface controls
-        settingsContainerTooltip: 'Settings to create areas of reachability',           // Tooltip and aria-label to explain the purpose of the plugin UI
-        settingsContainerStyleClass: 'reachability-control-settings-container',         // The container holding the user interface controls which is displayed if collapsed is false, or when the user expands the control by clicking on the expand button
-        settingsButtonStyleClass: 'reachability-control-settings-button',               // Generic class to style the setting buttons uniformly - further customisation per button is available with specific options below
-        activeStyleClass: 'reachability-control-active',                                // Indicate to the user which button is active in the settings and the collapsed state of the control if settings are active
-        errorStyleClass: 'reachability-control-error',                                  // Gives feedback to the user via the buttons in the user interface that something went wrong
+        settingsContainerTooltip: 'Settings to create areas of reachability',   // Tooltip and aria-label to explain the purpose of the plugin UI
+        settingsContainerStyleClass: 'reachability-control-settings-container', // The container holding the user interface controls which is displayed if collapsed is false, or when the user expands the control by clicking on the expand button
+        settingsButtonStyleClass: 'reachability-control-settings-button',       // Generic class to style the setting buttons uniformly - further customisation per button is available with specific options below
+        activeStyleClass: 'reachability-control-active',                        // Indicate to the user which button is active in the settings and the collapsed state of the control if settings are active
+        errorStyleClass: 'reachability-control-error',                          // Gives feedback to the user via the buttons in the user interface that something went wrong
 
         // If collapsed == true a button is displayed to expand/collapse the control
-        expandCollapseButtonContent: '&#x2609;',                                        // HTML to display within the control if it is collapsed. If you want an icon from services like Fontawesome pass '' for this value and set the StyleClass option
-        expandCollapseButtonStyleClass: 'reachability-control-expand-collapse-button',  // Allow options for styling - if you want to use an icon from services like fontawesome pass the declarations here, e.g. 'fa fa-home' etc.
-        expandCollapseButtonTooltip: 'Reachability options',                            // Tooltip to appear on-hover
+        toggleButtonContent: '&#x2609;',                                        // HTML to display within the control if it is collapsed. If you want an icon from services like Fontawesome pass '' for this value and set the StyleClass option
+        toggleButtonStyleClass: 'reachability-control-toggle-button',           // Allow options for styling - if you want to use an icon from services like fontawesome pass the declarations here, e.g. 'fa fa-home' etc.
+        toggleButtonTooltip: 'Reachability options',                            // Tooltip to appear on-hover
 
         // Draw isochrones button
         drawButtonContent: 'drw',
@@ -172,8 +172,8 @@ L.Control.Reachability = L.Control.extend({
         if (this._collapsed) {
             // If the control is in its collapsed state we need to create a button to toggle between collapsed and expanded states and initially hide the main UI
             // Sticking with creating this as an anchor element for now as per other Leaflet controls such as Zoom, but monitoring the situation for changes e.g. https://github.com/Leaflet/Leaflet/issues/7368
-            this._expandCollapseButton = this._createButton('a', this.options.expandCollapseButtonContent, this.options.expandCollapseButtonTooltip, 'button', this.options.expandCollapseButtonStyleClass, this._container, this._expandCollapseToggle);
-            this._expandCollapseButton.setAttribute('aria-expanded', 'false');
+            this._toggleButton = this._createButton('a', this.options.toggleButtonContent, this.options.toggleButtonTooltip, 'button', this.options.toggleButtonStyleClass, this._container, this._expandCollapseToggle);
+            this._toggleButton.setAttribute('aria-expanded', 'false');
         }
 
         // Container for the user interface controls - these will be displayed permanently if the collapsed option is false, otherwise when the user clicks on the collapsed control toggle button
@@ -355,7 +355,7 @@ L.Control.Reachability = L.Control.extend({
 
     // Decide whether we need to expand or collapse the UI based on the aria-expanded attribute
     _expandCollapseToggle: function () {
-        (this._expandCollapseButton.getAttribute('aria-expanded') === 'true') ? this._collapse() : this._expand();
+        (this._toggleButton.getAttribute('aria-expanded') === 'true') ? this._collapse() : this._expand();
     },
 
     _expand: function () {
@@ -366,7 +366,7 @@ L.Control.Reachability = L.Control.extend({
         if (L.DomUtil.hasClass(this._container, this.options.activeStyleClass)) L.DomUtil.removeClass(this._container, this.options.activeStyleClass);
 
         // Accessibility: set the expanded state of the expand button to true
-        this._expandCollapseButton.setAttribute('aria-expanded', 'true');
+        this._toggleButton.setAttribute('aria-expanded', 'true');
 
         // Fire event to inform that the control has been expanded
         this._map.fire('reachability:control_expanded');
@@ -380,7 +380,7 @@ L.Control.Reachability = L.Control.extend({
         if ((this._drawMode || this._deleteMode) && !L.DomUtil.hasClass(this._container, this.options.activeStyleClass)) L.DomUtil.addClass(this._container, this.options.activeStyleClass);
 
         // Accessibility: set the expanded state of the expand button to false
-        this._expandCollapseButton.setAttribute('aria-expanded', 'false');
+        this._toggleButton.setAttribute('aria-expanded', 'false');
 
         // Fire event to inform that the control has been collapsed
         this._map.fire('reachability:control_collapsed');
