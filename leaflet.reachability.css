@@ -78,7 +78,11 @@ button.reachability-control-settings-button:disabled
 }
 
 /* General class for highlighting the selected 'button' controls in the user interface container and the collapsed control if either the draw or delete mode is active */
-.reachability-control-active, .leaflet-touch .reachability-control-active, .reachability-control-active a, .leaflet-touch .reachability-control-active a
+.reachability-control-active,
+.leaflet-touch .reachability-control-active,
+.reachability-control-active a,
+.leaflet-touch .reachability-control-active a,
+[aria-checked="true"].reachability-control-settings-button
 {
     border-color: #0073d4;
     color: #0359A0;

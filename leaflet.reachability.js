@@ -41,6 +41,8 @@ L.Control.Reachability = L.Control.extend({
         deleteButtonTooltip: 'Delete reachability',
 
         // Isoline calculation mode - either distance or time
+        methodLabel: '',
+
         distanceButtonContent: 'dst',
         distanceButtonStyleClass: '',
         distanceButtonTooltip: 'Reachability based on distance',
@@ -50,6 +52,8 @@ L.Control.Reachability = L.Control.extend({
         timeButtonTooltip: 'Reachability based on time',
 
         // Travel modes
+        travelModesLabel: 'Travel mode options',                    // Tooltip and aria-label for the travel modes container div. Required to enable radio button-like functionality
+
         travelModeButton1Content: 'car',
         travelModeButton1StyleClass: '',
         travelModeButton1Tooltip: 'Travel mode: car',
@@ -167,7 +171,7 @@ L.Control.Reachability = L.Control.extend({
         if (this._collapsed) {
             // If the control is in its collapsed state we need to create a button to toggle between collapsed and expanded states and initially hide the main UI
             // Sticking with creating this as an anchor element for now as per other Leaflet controls such as Zoom, but monitoring the situation for changes e.g. https://github.com/Leaflet/Leaflet/issues/7368
-            this._expandCollapseButton = this._createButton('a', this.options.expandCollapseButtonContent, this.options.expandCollapseButtonTooltip, this.options.expandCollapseButtonStyleClass, this._container, this._expandCollapseToggle);
+            this._expandCollapseButton = this._createButton('a', this.options.expandCollapseButtonContent, this.options.expandCollapseButtonTooltip, 'button', this.options.expandCollapseButtonStyleClass, this._container, this._expandCollapseToggle);
             this._expandCollapseButton.setAttribute('aria-expanded', 'false');
         }
 
@@ -180,35 +184,38 @@ L.Control.Reachability = L.Control.extend({
         this._actionsAndMethodContainer = L.DomUtil.create('div', 'reachability-control-settings-block-container', this._uiContainer);
 
         // Draw button - to create isolines
-        this._drawControl = this._createButton('button', this.options.drawButtonContent, this.options.drawButtonTooltip, this.options.settingsButtonStyleClass + ' ' + this.options.drawButtonStyleClass, this._actionsAndMethodContainer, this._toggleDraw);
+        this._drawControl = this._createButton('button', this.options.drawButtonContent, this.options.drawButtonTooltip, 'button', this.options.settingsButtonStyleClass + ' ' + this.options.drawButtonStyleClass, this._actionsAndMethodContainer, this._toggleDraw);
         this._drawControl.setAttribute('aria-pressed', 'false'); // Accessibility: indicate that the button is not currently pressed
 
         // Delete button - to remove isolines
-        this._deleteControl = this._createButton('button', this.options.deleteButtonContent, this.options.deleteButtonTooltip, this.options.settingsButtonStyleClass + ' ' + this.options.deleteButtonStyleClass, this._actionsAndMethodContainer, this._toggleDelete);
+        this._deleteControl = this._createButton('button', this.options.deleteButtonContent, this.options.deleteButtonTooltip, 'button', this.options.settingsButtonStyleClass + ' ' + this.options.deleteButtonStyleClass, this._actionsAndMethodContainer, this._toggleDelete);
         this._deleteControl.setAttribute('aria-pressed', 'false');  // Accessibility: indicate that the button is not currently pressed
         this._deleteControl.setAttribute('disabled', '');           // The button is currently not available as there are no reachability areas displayed on the map to delete
 
         // Distance setting button - to calculate isolines based on distance (isodistance)
-        this._distanceControl = this._createButton('button', this.options.distanceButtonContent, this.options.distanceButtonTooltip, this.options.settingsButtonStyleClass + ' ' + this.options.distanceButtonStyleClass, this._actionsAndMethodContainer, this._setRangeByDistance);
+        this._distanceControl = this._createButton('button', this.options.distanceButtonContent, this.options.distanceButtonTooltip, 'radio', this.options.settingsButtonStyleClass + ' ' + this.options.distanceButtonStyleClass, this._actionsAndMethodContainer, this._setRangeByDistance);
 
         // Time setting button - to calculate isolines based on time (isochrones)
-        this._timeControl = this._createButton('button', this.options.timeButtonContent, this.options.timeButtonTooltip, this.options.settingsButtonStyleClass + ' ' + this.options.timeButtonStyleClass, this._actionsAndMethodContainer, this._setRangeByTime);
+        this._timeControl = this._createButton('button', this.options.timeButtonContent, this.options.timeButtonTooltip, 'radio', this.options.settingsButtonStyleClass + ' ' + this.options.timeButtonStyleClass, this._actionsAndMethodContainer, this._setRangeByTime);
 
 
         // Container for the travel mode buttons
         this._modesContainer = L.DomUtil.create('div', 'reachability-control-settings-block-container', this._uiContainer);
+        this._modesContainer.setAttribute('role', 'radiogroup');    // Accessibility: to allow the travel mode buttons to act like a radio button group
+        this._modesContainer.setAttribute('aria-label', this.options.travelModesLabel); // Describes the purpose of the group of buttons to screen readers...
+        this._modesContainer.setAttribute('title', this.options.travelModesLabel);      // ...and via tooltip
 
         // Travel mode 1 button - this is the only required button as there has to be at least one mode of travel to query the API
-        this._travelMode1Control = this._createButton('button', this.options.travelModeButton1Content, this.options.travelModeButton1Tooltip, this.options.settingsButtonStyleClass + ' ' + this.options.travelModeButton1StyleClass, this._modesContainer, this._setTravelMode1);
+        this._travelMode1Control = this._createButton('button', this.options.travelModeButton1Content, this.options.travelModeButton1Tooltip, 'radio', this.options.settingsButtonStyleClass + ' ' + this.options.travelModeButton1StyleClass, this._modesContainer, function(){this._setTravelMode(this.options.travelModeProfile1)});
 
         // Travel mode 2 button
-        this._travelMode2Control = (this.options.travelModeProfile2 != null) ? this._createButton('button', this.options.travelModeButton2Content, this.options.travelModeButton2Tooltip, this.options.settingsButtonStyleClass + ' ' + this.options.travelModeButton2StyleClass, this._modesContainer, this._setTravelMode2) : L.DomUtil.create('span', '');
+        this._travelMode2Control = (this.options.travelModeProfile2 != null) ? this._createButton('button', this.options.travelModeButton2Content, this.options.travelModeButton2Tooltip, 'radio', this.options.settingsButtonStyleClass + ' ' + this.options.travelModeButton2StyleClass, this._modesContainer, function(){this._setTravelMode(this.options.travelModeProfile2)}) : L.DomUtil.create('span', '');
 
         // Travel mode 3 button
-        this._travelMode3Control = (this.options.travelModeProfile3 != null) ? this._createButton('button', this.options.travelModeButton3Content, this.options.travelModeButton3Tooltip, this.options.settingsButtonStyleClass + ' ' + this.options.travelModeButton3StyleClass, this._modesContainer, this._setTravelMode3) : L.DomUtil.create('span', '');
+        this._travelMode3Control = (this.options.travelModeProfile3 != null) ? this._createButton('button', this.options.travelModeButton3Content, this.options.travelModeButton3Tooltip, 'radio', this.options.settingsButtonStyleClass + ' ' + this.options.travelModeButton3StyleClass, this._modesContainer, function(){this._setTravelMode(this.options.travelModeProfile3)}) : L.DomUtil.create('span', '');
 
         // Travel mode 4 button
-        this._travelMode4Control = (this.options.travelModeProfile4 != null) ? this._createButton('button', this.options.travelModeButton4Content, this.options.travelModeButton4Tooltip, this.options.settingsButtonStyleClass + ' ' + this.options.travelModeButton4StyleClass, this._modesContainer, this._setTravelMode4) : L.DomUtil.create('span', '');
+        this._travelMode4Control = (this.options.travelModeProfile4 != null) ? this._createButton('button', this.options.travelModeButton4Content, this.options.travelModeButton4Tooltip, 'radio', this.options.settingsButtonStyleClass + ' ' + this.options.travelModeButton4StyleClass, this._modesContainer, function(){this._setTravelMode(this.options.travelModeProfile4)}) : L.DomUtil.create('span', '');
 
 
         // Distance range title
@@ -304,12 +311,12 @@ L.Control.Reachability = L.Control.extend({
         }
 
         // Select the correct travel mode button
-        this._toggleTravelMode(null);   // Null causes the function to operate in a different way, setting up the initial state
+        this._setTravelMode(null);   // Null causes the function to operate in a different way, setting up the initial state
     },
 
     // An amended version of the Leaflet.js function of the same name, (c) 2010-2018 Vladimir Agafonkin, (c) 2010-2011 CloudMade
     // Allows interface elements to be created using different tags, not just anchors
-    _createButton: function (tag, html, title, className, container, fn) {
+    _createButton: function (tag, html, title, role, className, container, fn) {
         // Create a control button
         var button = L.DomUtil.create(tag, className, container);
         button.innerHTML = html;
@@ -318,7 +325,7 @@ L.Control.Reachability = L.Control.extend({
         // For accessibility
         button.setAttribute('aria-label', title);   // uses the same content as the tooltip
         button.setAttribute('tabindex', '0');       // this allows the element if it is not a <button> to be focussable - especially important if it is an anchor as we are not setting the href property, see: https://github.com/Leaflet/Leaflet/issues/7368
-        button.setAttribute('role', 'button');      // doesn't matter if the element is actually a button, but this helps ensure CSS etc. is consistent if [role="button"] is used as a selector
+        button.setAttribute('role', role);          // e.g. "button" or "radio"
 
         // Set events
         L.DomEvent
@@ -586,55 +593,18 @@ L.Control.Reachability = L.Control.extend({
         }
     },
 
-    // Toggle the UI buttons for the modes of travel
-    _setTravelMode1: function () {
-        this._toggleTravelMode(this.options.travelModeProfile1);
-    },
-
-    _setTravelMode2: function () {
-        this._toggleTravelMode(this.options.travelModeProfile2);
-    },
-
-    _setTravelMode3: function () {
-        this._toggleTravelMode(this.options.travelModeProfile3);
-    },
-
-    _setTravelMode4: function () {
-        this._toggleTravelMode(this.options.travelModeProfile4);
-    },
-
-    _toggleTravelMode: function (mode) {
+    // Set the UI buttons for the selected mode of travel
+    _setTravelMode: function (mode) {
         // This function is called first to set the default active travel mode and then from then on when the user selects the different modes
         var def_mode = (mode == null) ? this._travelMode : mode;
 
         if (this._travelMode != mode) {
-            switch (def_mode) {
-                case this.options.travelModeProfile2:
-                    L.DomUtil.removeClass(this._travelMode1Control, this.options.activeStyleClass);
-                    L.DomUtil.addClass(this._travelMode2Control, this.options.activeStyleClass);
-                    L.DomUtil.removeClass(this._travelMode3Control, this.options.activeStyleClass);
-                    L.DomUtil.removeClass(this._travelMode4Control, this.options.activeStyleClass);
-                    break;
-                case this.options.travelModeProfile3:
-                    L.DomUtil.removeClass(this._travelMode1Control, this.options.activeStyleClass);
-                    L.DomUtil.removeClass(this._travelMode2Control, this.options.activeStyleClass);
-                    L.DomUtil.addClass(this._travelMode3Control, this.options.activeStyleClass);
-                    L.DomUtil.removeClass(this._travelMode4Control, this.options.activeStyleClass);
-                    break;
-                case this.options.travelModeProfile4:
-                    L.DomUtil.removeClass(this._travelMode1Control, this.options.activeStyleClass);
-                    L.DomUtil.removeClass(this._travelMode2Control, this.options.activeStyleClass);
-                    L.DomUtil.removeClass(this._travelMode3Control, this.options.activeStyleClass);
-                    L.DomUtil.addClass(this._travelMode4Control, this.options.activeStyleClass);
-                    break;
-                default:
-                    L.DomUtil.addClass(this._travelMode1Control, this.options.activeStyleClass);
-                    L.DomUtil.removeClass(this._travelMode2Control, this.options.activeStyleClass);
-                    L.DomUtil.removeClass(this._travelMode3Control, this.options.activeStyleClass);
-                    L.DomUtil.removeClass(this._travelMode4Control, this.options.activeStyleClass);
-            }
-
-            this._travelMode = def_mode;
+            // Set the correct 'checked' state for the travel buttons (CSS handles the active state styling based on this)
+            this._travelMode1Control.setAttribute('aria-checked', (def_mode == this.options.travelModeProfile1) ? 'true' : 'false');
+            this._travelMode2Control.setAttribute('aria-checked', (def_mode == this.options.travelModeProfile2) ? 'true' : 'false');
+            this._travelMode3Control.setAttribute('aria-checked', (def_mode == this.options.travelModeProfile3) ? 'true' : 'false');
+            this._travelMode4Control.setAttribute('aria-checked', (def_mode == this.options.travelModeProfile4) ? 'true' : 'false');
+            this._travelMode = def_mode;    // set the internal flag for the selected travel mode
         }
     },
 
