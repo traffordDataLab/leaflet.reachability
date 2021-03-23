@@ -74,6 +74,10 @@ a.reachability-control-toggle-button + div.reachability-control-settings-contain
     padding-bottom: 10px;
     border-bottom: 1px dotted #757575;
 }
+.reachability-control-settings-block-container span /* This is the sub-container for the calculation method buttons: distance and time */
+{
+    display: inline-block;
+}
 
 /* General class for highlighting the selected 'button' controls in the user interface container and the collapsed control if either the draw or delete mode is active */
 .reachability-control-active,

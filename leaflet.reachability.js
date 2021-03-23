@@ -20,7 +20,7 @@ L.Control.Reachability = L.Control.extend({
         drawActiveMouseClass: 'leaflet-crosshair',                              // CSS class applied to the mouse pointer when the plugin is in draw mode
 
         // The containing div to hold the actual user interface controls
-        settingsContainerTooltip: 'Settings to create areas of reachability',   // Tooltip and aria-label to explain the purpose of the plugin UI
+        settingsContainerTooltip: 'Reachability control options',               // Tooltip and aria-label to explain the purpose of the plugin UI
         settingsContainerStyleClass: 'reachability-control-settings-container', // The container holding the user interface controls which is displayed if collapsed is false, or when the user expands the control by clicking on the expand button
         settingsButtonStyleClass: 'reachability-control-settings-button',       // Generic class to style the setting buttons uniformly - further customisation per button is available with specific options below
         activeStyleClass: 'reachability-control-active',                        // Indicate to the user which button is active in the settings and the collapsed state of the control if settings are active
@@ -29,20 +29,20 @@ L.Control.Reachability = L.Control.extend({
         // If collapsed == true a button is displayed to expand/collapse the control
         toggleButtonContent: '&#x2609;',                                        // HTML to display within the control if it is collapsed. If you want an icon from services like Fontawesome pass '' for this value and set the StyleClass option
         toggleButtonStyleClass: 'reachability-control-toggle-button',           // Allow options for styling - if you want to use an icon from services like fontawesome pass the declarations here, e.g. 'fa fa-home' etc.
-        toggleButtonTooltip: 'Reachability options',                            // Tooltip to appear on-hover
+        toggleButtonTooltip: 'Reachability',                                    // Tooltip to appear on-hover and also used as the aria-label attribute
 
         // Draw isochrones button
         drawButtonContent: 'drw',
         drawButtonStyleClass: '',
-        drawButtonTooltip: 'Draw reachability',
+        drawButtonTooltip: 'Draw reachability area',
 
         // Delete button to remove any current isoline groups drawn on the map
         deleteButtonContent: 'del',
         deleteButtonStyleClass: '',
-        deleteButtonTooltip: 'Delete reachability',
+        deleteButtonTooltip: 'Delete reachability area',
 
         // Isoline calculation mode - either distance or time
-        methodTooltip: 'Calculation method options',
+        methodTooltip: 'Calculation method',
 
         distanceButtonContent: 'dst',
         distanceButtonStyleClass: '',
@@ -53,7 +53,7 @@ L.Control.Reachability = L.Control.extend({
         timeButtonTooltip: 'Reachability based on time',
 
         // Travel modes
-        travelModesTooltip: 'Travel mode options',                    // Tooltip and aria-label for the travel modes container div. Required to enable radio button-like functionality
+        travelModesTooltip: 'Travel modes', // Tooltip and aria-label for the travel modes container div. Required to enable radio button-like functionality
 
         travelModeButton1Content: 'car',
         travelModeButton1StyleClass: '',
@@ -85,8 +85,8 @@ L.Control.Reachability = L.Control.extend({
         rangeControlTimeMax: 30,                            //  > All these values will be multiplied by 60 to convert to seconds - no other unit of time is allowed
         rangeControlTimeInterval: 5,                        // /
 
-        rangeTypeDefault: 'time',                       // Range can be either distance or time - any value other than 'distance' passed to the API is assumed to be 'time'
-        rangeIntervalsLabel: 'intervals',               // The label associated to the intervals checkbox
+        rangeTypeDefault: 'time',                           // Range can be either distance or time - any value other than 'distance' passed to the API is assumed to be 'time'
+        rangeIntervalsLabel: 'intervals',                   // The label associated to the intervals checkbox
         rangeIntervalsLabelTooltip: 'Show reachability for intervals up to and including the selected value',  // A fuller description of the intervals checkbox displayed as a tooltip and also used as the aria-label for screen readers
 
         // API settings
@@ -195,11 +195,17 @@ L.Control.Reachability = L.Control.extend({
         this._deleteControl.setAttribute('aria-pressed', 'false');  // Accessibility: indicate that the button is not currently pressed
         this._deleteControl.setAttribute('disabled', '');           // The button is currently not available as there are no reachability areas displayed on the map to delete
 
+        // Container for the calculation method buttons
+        this._methodContainer = L.DomUtil.create('span', '', this._actionsAndMethodContainer);
+        this._methodContainer.setAttribute('role', 'radiogroup');   // Accessibility: to allow the distance and time buttons to act like a radio button group
+        this._methodContainer.setAttribute('aria-label', this.options.methodTooltip); // Describes the purpose of the group of buttons to screen readers...
+        this._methodContainer.setAttribute('title', this.options.methodTooltip);      // ...and via tooltip
+
         // Distance setting button - to calculate isolines based on distance (isodistance)
-        this._distanceControl = this._createButton('button', this.options.distanceButtonContent, this.options.distanceButtonTooltip, 'radio', this.options.settingsButtonStyleClass + ' ' + this.options.distanceButtonStyleClass, this._actionsAndMethodContainer, this._setRangeByDistance);
+        this._distanceControl = this._createButton('button', this.options.distanceButtonContent, this.options.distanceButtonTooltip, 'radio', this.options.settingsButtonStyleClass + ' ' + this.options.distanceButtonStyleClass, this._methodContainer, this._setRangeByDistance);
 
         // Time setting button - to calculate isolines based on time (isochrones)
-        this._timeControl = this._createButton('button', this.options.timeButtonContent, this.options.timeButtonTooltip, 'radio', this.options.settingsButtonStyleClass + ' ' + this.options.timeButtonStyleClass, this._actionsAndMethodContainer, this._setRangeByTime);
+        this._timeControl = this._createButton('button', this.options.timeButtonContent, this.options.timeButtonTooltip, 'radio', this.options.settingsButtonStyleClass + ' ' + this.options.timeButtonStyleClass, this._methodContainer, this._setRangeByTime);
 
 
         // Container for the travel mode buttons
