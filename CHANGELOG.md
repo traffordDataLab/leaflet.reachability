@@ -18,9 +18,9 @@ This is a new major version release and so contains breaking changes compared to
 `rangeControlDistanceTitle` is now `rangeControlDistanceLabel`
 `rangeControlTimeTitle` is now `rangeControlTimeLabel`
 - Delete button has `disabled` attribute set when there are no reachability areas on the map
-- Added `title` (tooltips) and `aria-label` attributes to the distance, time and intervals `<label>`s to give further information on their function:<br />
+- Added `title` (tooltips) and `aria-label` attributes to the distance, time and intervals `<label>`s as well as the UI, range measurement and travel mode containers to give further information on their function:<br />
 **Added the following parameters**:<br />
-`rangeControlDistanceLabelTooltip`, `rangeControlTimeLabelTooltip`, `rangeIntervalsLabelTooltip`<br />
+`settingsContainerTooltip`, `rangeTypeTooltip`, `travelModesTooltip`, `rangeControlDistanceLabelTooltip`, `rangeControlTimeLabelTooltip`, `rangeIntervalsLabelTooltip`<br />
 
 ## 2.0.1 (2020-11-27)
 Minor update to the attribution in accordance with the [OpenRouteService updated terms of service](https://openrouteservice.org/terms-of-service/).

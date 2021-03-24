@@ -41,8 +41,8 @@ L.Control.Reachability = L.Control.extend({
         deleteButtonStyleClass: '',
         deleteButtonTooltip: 'Delete reachability area',
 
-        // Isoline calculation mode - either distance or time
-        methodTooltip: 'Calculation method',
+        // Isoline measure for calculation - either distance or time
+        rangeTypeTooltip: 'Range measurement',  // Tooltip and aria-label for the range measurement options container div. Required to enable radio button-like functionality
 
         distanceButtonContent: 'dst',
         distanceButtonStyleClass: '',
@@ -53,7 +53,7 @@ L.Control.Reachability = L.Control.extend({
         timeButtonTooltip: 'Reachability based on time',
 
         // Travel modes
-        travelModesTooltip: 'Travel modes', // Tooltip and aria-label for the travel modes container div. Required to enable radio button-like functionality
+        travelModesTooltip: 'Travel modes',     // Tooltip and aria-label for the travel modes container div. Required to enable radio button-like functionality
 
         travelModeButton1Content: 'car',
         travelModeButton1StyleClass: '',
@@ -183,29 +183,29 @@ L.Control.Reachability = L.Control.extend({
         if (this._collapsed) L.DomUtil.addClass(this._uiContainer, 'reachability-control-hide-content');    // Hide the UI initially as the control is in the collapsed state
         this._container.appendChild(this._uiContainer);
 
-        // Container for the draw and delete action buttons and the time and distance method buttons
-        this._actionsAndMethodContainer = L.DomUtil.create('div', 'reachability-control-settings-block-container', this._uiContainer);
+        // Container for the draw and delete action buttons and the time and distance range measurement buttons
+        this._actionsAndRangeTypeContainer = L.DomUtil.create('div', 'reachability-control-settings-block-container', this._uiContainer);
 
         // Draw button - to create isolines
-        this._drawControl = this._createButton('button', this.options.drawButtonContent, this.options.drawButtonTooltip, 'button', this.options.settingsButtonStyleClass + ' ' + this.options.drawButtonStyleClass, this._actionsAndMethodContainer, this._toggleDraw);
+        this._drawControl = this._createButton('button', this.options.drawButtonContent, this.options.drawButtonTooltip, 'button', this.options.settingsButtonStyleClass + ' ' + this.options.drawButtonStyleClass, this._actionsAndRangeTypeContainer, this._toggleDraw);
         this._drawControl.setAttribute('aria-pressed', 'false');    // Accessibility: indicate that the button is not currently pressed
 
         // Delete button - to remove isolines
-        this._deleteControl = this._createButton('button', this.options.deleteButtonContent, this.options.deleteButtonTooltip, 'button', this.options.settingsButtonStyleClass + ' ' + this.options.deleteButtonStyleClass, this._actionsAndMethodContainer, this._toggleDelete);
+        this._deleteControl = this._createButton('button', this.options.deleteButtonContent, this.options.deleteButtonTooltip, 'button', this.options.settingsButtonStyleClass + ' ' + this.options.deleteButtonStyleClass, this._actionsAndRangeTypeContainer, this._toggleDelete);
         this._deleteControl.setAttribute('aria-pressed', 'false');  // Accessibility: indicate that the button is not currently pressed
         this._deleteControl.setAttribute('disabled', '');           // The button is currently not available as there are no reachability areas displayed on the map to delete
 
         // Container for the calculation method buttons
-        this._methodContainer = L.DomUtil.create('span', '', this._actionsAndMethodContainer);
-        this._methodContainer.setAttribute('role', 'radiogroup');   // Accessibility: to allow the distance and time buttons to act like a radio button group
-        this._methodContainer.setAttribute('aria-label', this.options.methodTooltip); // Describes the purpose of the group of buttons to screen readers...
-        this._methodContainer.setAttribute('title', this.options.methodTooltip);      // ...and via tooltip
+        this._rangeTypeContainer = L.DomUtil.create('span', '', this._actionsAndRangeTypeContainer);
+        this._rangeTypeContainer.setAttribute('role', 'radiogroup');   // Accessibility: to allow the distance and time buttons to act like a radio button group
+        this._rangeTypeContainer.setAttribute('aria-label', this.options.rangeTypeTooltip); // Describes the purpose of the group of buttons to screen readers...
+        this._rangeTypeContainer.setAttribute('title', this.options.rangeTypeTooltip);      // ...and via tooltip
 
         // Distance setting button - to calculate isolines based on distance (isodistance)
-        this._distanceControl = this._createButton('button', this.options.distanceButtonContent, this.options.distanceButtonTooltip, 'radio', this.options.settingsButtonStyleClass + ' ' + this.options.distanceButtonStyleClass, this._methodContainer, this._setRangeByDistance);
+        this._distanceControl = this._createButton('button', this.options.distanceButtonContent, this.options.distanceButtonTooltip, 'radio', this.options.settingsButtonStyleClass + ' ' + this.options.distanceButtonStyleClass, this._rangeTypeContainer, this._setRangeByDistance);
 
         // Time setting button - to calculate isolines based on time (isochrones)
-        this._timeControl = this._createButton('button', this.options.timeButtonContent, this.options.timeButtonTooltip, 'radio', this.options.settingsButtonStyleClass + ' ' + this.options.timeButtonStyleClass, this._methodContainer, this._setRangeByTime);
+        this._timeControl = this._createButton('button', this.options.timeButtonContent, this.options.timeButtonTooltip, 'radio', this.options.settingsButtonStyleClass + ' ' + this.options.timeButtonStyleClass, this._rangeTypeContainer, this._setRangeByTime);
 
 
         // Container for the travel mode buttons
@@ -307,17 +307,8 @@ L.Control.Reachability = L.Control.extend({
         this._showIntervalLabel.innerHTML = this.options.rangeIntervalsLabel;
 
 
-        // Select the correct range type button and show the correct range list
-        if (this._rangeIsDistance) {
-            L.DomUtil.addClass(this._distanceControl, this.options.activeStyleClass);
-            L.DomUtil.removeClass(this._rangeDistanceLabel, 'reachability-control-hide-content');
-            L.DomUtil.removeClass(this._rangeDistanceList, 'reachability-control-hide-content');
-        }
-        else {
-            L.DomUtil.addClass(this._timeControl, this.options.activeStyleClass);
-            L.DomUtil.removeClass(this._rangeTimeLabel, 'reachability-control-hide-content');
-            L.DomUtil.removeClass(this._rangeTimeList, 'reachability-control-hide-content');
-        }
+        // Select the correct range measurement button and show the correct range list
+        (this._rangeIsDistance) ? this._setRangeByDistance() : this._setRangeByTime();
 
         // Select the correct travel mode button
         this._setTravelMode(null);   // Null causes the function to operate in a different way, setting up the initial state
@@ -565,41 +556,37 @@ L.Control.Reachability = L.Control.extend({
         }, 500);
     },
 
-    // Toggle the UI buttons for distance and time like radio buttons
+    // Set the UI accordingly for the selected calculation method: distance or time
     _setRangeByDistance: function () {
-        if (this._rangeIsDistance == false) {
-            // The mode buttons
-            L.DomUtil.addClass(this._distanceControl, this.options.activeStyleClass);
-            L.DomUtil.removeClass(this._timeControl, this.options.activeStyleClass);
+        // Set the correct 'checked' state for the distance and time buttons (CSS handles the active state styling based on this)
+        this._distanceControl.setAttribute('aria-checked', 'true');
+        this._timeControl.setAttribute('aria-checked', 'false');
 
-            // The range titles
-            L.DomUtil.removeClass(this._rangeDistanceLabel, 'reachability-control-hide-content');
-            L.DomUtil.addClass(this._rangeTimeLabel, 'reachability-control-hide-content');
+        // The range titles
+        L.DomUtil.removeClass(this._rangeDistanceLabel, 'reachability-control-hide-content');
+        L.DomUtil.addClass(this._rangeTimeLabel, 'reachability-control-hide-content');
 
-            // The range lists
-            L.DomUtil.removeClass(this._rangeDistanceList, 'reachability-control-hide-content');
-            L.DomUtil.addClass(this._rangeTimeList, 'reachability-control-hide-content');
+        // The range lists
+        L.DomUtil.removeClass(this._rangeDistanceList, 'reachability-control-hide-content');
+        L.DomUtil.addClass(this._rangeTimeList, 'reachability-control-hide-content');
 
-            this._rangeIsDistance = true;
-        }
+        this._rangeIsDistance = true;
     },
 
     _setRangeByTime: function () {
-        if (this._rangeIsDistance) {
-            // The mode buttons
-            L.DomUtil.addClass(this._timeControl, this.options.activeStyleClass);
-            L.DomUtil.removeClass(this._distanceControl, this.options.activeStyleClass);
+        // Set the correct 'checked' state for the distance and time buttons (CSS handles the active state styling based on this)
+        this._timeControl.setAttribute('aria-checked', 'true');
+        this._distanceControl.setAttribute('aria-checked', 'false');
 
-            // The range titles
-            L.DomUtil.removeClass(this._rangeTimeLabel, 'reachability-control-hide-content');
-            L.DomUtil.addClass(this._rangeDistanceLabel, 'reachability-control-hide-content');
+        // The range titles
+        L.DomUtil.removeClass(this._rangeTimeLabel, 'reachability-control-hide-content');
+        L.DomUtil.addClass(this._rangeDistanceLabel, 'reachability-control-hide-content');
 
-            // The range lists
-            L.DomUtil.removeClass(this._rangeTimeList, 'reachability-control-hide-content');
-            L.DomUtil.addClass(this._rangeDistanceList, 'reachability-control-hide-content');
+        // The range lists
+        L.DomUtil.removeClass(this._rangeTimeList, 'reachability-control-hide-content');
+        L.DomUtil.addClass(this._rangeDistanceList, 'reachability-control-hide-content');
 
-            this._rangeIsDistance = false;
-        }
+        this._rangeIsDistance = false;
     },
 
     // Set the UI buttons for the selected mode of travel
