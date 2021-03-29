@@ -122,10 +122,9 @@ L.Control.Reachability = L.Control.extend({
         this._deleteMode = false;
         this._rangeIsDistance = (this.options.rangeTypeDefault == 'distance') ? true : false;
 
-        // Choose the travel mode button which is selected by default
+        // Sort out the default travel mode
         if (this.options.travelModeProfile1 == null) this.options.travelModeProfile1 = 'driving-car';   // travelModeProfile1 cannot be null as we must ensure we have at least one valid mode of travel to query the API
-        this._travelMode = this.options.travelModeDefault;
-        if (this._travelMode == null || (this._travelMode != this.options.travelModeProfile1 && this._travelMode != this.options.travelModeProfile2 && this._travelMode != this.options.travelModeProfile3 && this._travelMode != this.options.travelModeProfile4)) this._travelMode = this.options.travelModeProfile1;
+        this._travelMode = this.options.travelModeDefault;  // if this is null it will be set to travelModeProfile1 when the interface is created
 
         // Invisible Leaflet marker to follow the mouse pointer when control is activated, preventing interactions with map elements which we don't want whilst in draw or delete mode
         this._mouseMarker = null;
@@ -310,8 +309,8 @@ L.Control.Reachability = L.Control.extend({
         // Select the correct range measurement button and show the correct range list
         (this._rangeIsDistance) ? this._setRangeByDistance() : this._setRangeByTime();
 
-        // Select the correct travel mode button
-        this._setTravelMode(null);   // Null causes the function to operate in a different way, setting up the initial state
+        // Select the correct travel mode button for the initial state
+        this._setTravelMode(this._travelMode);
     },
 
     // An amended version of the Leaflet.js function of the same name, (c) 2010-2018 Vladimir Agafonkin, (c) 2010-2011 CloudMade
@@ -592,16 +591,14 @@ L.Control.Reachability = L.Control.extend({
     // Set the UI buttons for the selected mode of travel
     _setTravelMode: function (mode) {
         // This function is called first to set the default active travel mode and then from then on when the user selects the different modes
-        var def_mode = (mode == null) ? this._travelMode : mode;
+        var def_mode = (mode == null || (mode != this.options.travelModeProfile1 && mode != this.options.travelModeProfile2 && mode != this.options.travelModeProfile3 && mode != this.options.travelModeProfile4)) ? this.options.travelModeProfile1 : mode;
 
-        if (this._travelMode != mode) {
-            // Set the correct 'checked' state for the travel buttons (CSS handles the active state styling based on this)
-            this._travelMode1Control.setAttribute('aria-checked', (def_mode == this.options.travelModeProfile1) ? 'true' : 'false');
-            this._travelMode2Control.setAttribute('aria-checked', (def_mode == this.options.travelModeProfile2) ? 'true' : 'false');
-            this._travelMode3Control.setAttribute('aria-checked', (def_mode == this.options.travelModeProfile3) ? 'true' : 'false');
-            this._travelMode4Control.setAttribute('aria-checked', (def_mode == this.options.travelModeProfile4) ? 'true' : 'false');
-            this._travelMode = def_mode;    // set the internal flag for the selected travel mode
-        }
+        // Set the correct 'checked' state for the travel buttons (CSS handles the active state styling based on this)
+        this._travelMode1Control.setAttribute('aria-checked', (def_mode == this.options.travelModeProfile1) ? 'true' : 'false');
+        this._travelMode2Control.setAttribute('aria-checked', (def_mode == this.options.travelModeProfile2) ? 'true' : 'false');
+        this._travelMode3Control.setAttribute('aria-checked', (def_mode == this.options.travelModeProfile3) ? 'true' : 'false');
+        this._travelMode4Control.setAttribute('aria-checked', (def_mode == this.options.travelModeProfile4) ? 'true' : 'false');
+        this._travelMode = def_mode;    // set the internal flag for the selected travel mode
     },
 
     // Deals with updating the position of the invisible Leaflet marker that chases the mouse pointer or is set to the location of a touch.
