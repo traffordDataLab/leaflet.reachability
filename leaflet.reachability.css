@@ -84,6 +84,7 @@ a.reachability-control-toggle-button + div.reachability-control-settings-contain
 .leaflet-touch .reachability-control-active,
 .reachability-control-active a,
 .leaflet-touch .reachability-control-active a,
+[aria-pressed="true"].reachability-control-settings-button, /* This is specifically for the draw and delete buttons */
 [aria-checked="true"].reachability-control-settings-button  /* This is specifically for the radio-style buttons: distance, time and travel modes */
 {
     border-color: #0073d4;

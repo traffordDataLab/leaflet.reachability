@@ -397,9 +397,8 @@ L.Control.Reachability = L.Control.extend({
     },
 
     _activateDraw: function () {
-        // Set the flag to true and add active class to the draw button to show it's currently selected
+        // Set the internal flag to indicate the draw mode is on
         this._drawMode = true;
-        L.DomUtil.addClass(this._drawControl, this.options.activeStyleClass);
 
         // Accessibility: indicate that the draw button has been toggled on
         this._drawControl.setAttribute('aria-pressed', 'true');
@@ -448,7 +447,6 @@ L.Control.Reachability = L.Control.extend({
 
     _deactivateDraw: function () {
         this._drawMode = false;     // ensure we explicitly set the mode - we may not have come here from a click on the main control
-        L.DomUtil.removeClass(this._drawControl, this.options.activeStyleClass);    // remove the selected style
 
         // Accessibility: indicate that the draw button has been toggled off
         this._drawControl.setAttribute('aria-pressed', 'false');
@@ -492,7 +490,6 @@ L.Control.Reachability = L.Control.extend({
             else {
                 // We have more than one so the user will need to choose which to delete. Therefore set the control in delete mode and wait for the user event
                 this._deleteMode = true;
-                L.DomUtil.addClass(this._deleteControl, this.options.activeStyleClass);   // add the selected class to the delete button
 
                 // Accessibility: indicate that the delete button has been toggled on
                 this._deleteControl.setAttribute('aria-pressed', 'true');
@@ -510,7 +507,6 @@ L.Control.Reachability = L.Control.extend({
 
     _deactivateDelete: function () {
         this._deleteMode = false;
-        L.DomUtil.removeClass(this._deleteControl, this.options.activeStyleClass); // remove the selected class from the delete button
 
         // Accessibility: indicate that the delete button has been toggled off
         this._deleteControl.setAttribute('aria-pressed', 'false');
