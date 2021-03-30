@@ -65,27 +65,11 @@ a.reachability-control-toggle-button + div.reachability-control-settings-contain
     border-color: #ccc;
     cursor: default;
 }
-
-/* Dividers between the different UI sections */
-.reachability-control-settings-block-container
-{
-    display: block;
-    margin-bottom: 10px;
-    padding-bottom: 10px;
-    border-bottom: 1px dotted #757575;
-}
-.reachability-control-settings-block-container span /* This is the sub-container for the calculation method buttons: distance and time */
-{
-    display: inline-block;
-}
-
-/* General class for highlighting the selected 'button' controls in the user interface container and the collapsed control if either the draw or delete mode is active */
-.reachability-control-active,
-.leaflet-touch .reachability-control-active,
-.reachability-control-active a,
-.leaflet-touch .reachability-control-active a,
+/* 'Selected-state' for buttons in the user interface and the collapsed control if either the draw or delete mode is active */
 [aria-pressed="true"].reachability-control-settings-button, /* This is specifically for the draw and delete buttons */
-[aria-checked="true"].reachability-control-settings-button  /* This is specifically for the radio-style buttons: distance, time and travel modes */
+[aria-checked="true"].reachability-control-settings-button, /* This is specifically for the radio-style buttons: distance, time and travel modes */
+[data-reachability-active="true"].leaflet-control,          /* This is for the control container when it is collapsed and either draw or delete buttons are active */
+[data-reachability-active="true"].leaflet-control .reachability-control-toggle-button   /* Also applied to the anchor button */
 {
     border-color: #0073d4;
     color: #0359A0;
@@ -98,6 +82,19 @@ a.reachability-control-toggle-button + div.reachability-control-settings-contain
     border-color: red;
     color: red;
     box-shadow: 0 1px 5px rgba(255,0,0,0.65);
+}
+
+/* Dividers between the different UI sections */
+.reachability-control-settings-block-container
+{
+    display: block;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px dotted #757575;
+}
+.reachability-control-settings-block-container span /* This is the 'radio-group' sub-container for the range type buttons: distance and time */
+{
+    display: inline-block;
 }
 
 /* Container for the range titles - applies to both time and distance */

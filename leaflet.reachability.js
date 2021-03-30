@@ -23,7 +23,6 @@ L.Control.Reachability = L.Control.extend({
         settingsContainerTooltip: 'Reachability control options',               // Tooltip and aria-label to explain the purpose of the plugin UI
         settingsContainerStyleClass: 'reachability-control-settings-container', // The container holding the user interface controls which is displayed if collapsed is false, or when the user expands the control by clicking on the expand button
         settingsButtonStyleClass: 'reachability-control-settings-button',       // Generic class to style the setting buttons uniformly - further customisation per button is available with specific options below
-        activeStyleClass: 'reachability-control-active',                        // Indicate to the user which button is active in the settings and the collapsed state of the control if settings are active
         errorStyleClass: 'reachability-control-error',                          // Gives feedback to the user via the buttons in the user interface that something went wrong
 
         // If collapsed == true a button is displayed to expand/collapse the control
@@ -138,6 +137,7 @@ L.Control.Reachability = L.Control.extend({
         // Main container for the control - this is added to the map in the Leaflet control pane
         this._container = L.DomUtil.create('div', 'leaflet-bar ' + this.options.controlContainerStyleClass);
         L.DomEvent.disableClickPropagation(this._container);
+        this._container.setAttribute('data-reachability-active', 'false');  // HTML5 data- attribute, set to true when the control is collapsed and either the draw or delete button is active
 
         // Create the components for the user interface
         this._createUI();
@@ -358,8 +358,8 @@ L.Control.Reachability = L.Control.extend({
         // Show the user interface container
         L.DomUtil.removeClass(this._uiContainer, 'reachability-control-hide-content');
 
-        // Remove the active class from the control container if either the draw or delete modes are active
-        if (L.DomUtil.hasClass(this._container, this.options.activeStyleClass)) L.DomUtil.removeClass(this._container, this.options.activeStyleClass);
+        // Ensure that the 'active state' CSS is not applied when the control is expanded
+        this._container.setAttribute('data-reachability-active', 'false');
 
         // Accessibility: set the expanded state of the expand button to true
         this._toggleButton.setAttribute('aria-expanded', 'true');
@@ -372,8 +372,8 @@ L.Control.Reachability = L.Control.extend({
         // Hide the user interface container
         L.DomUtil.addClass(this._uiContainer, 'reachability-control-hide-content');
 
-        // Add the active class to the control container if either the draw or delete modes are active
-        if ((this._drawMode || this._deleteMode) && !L.DomUtil.hasClass(this._container, this.options.activeStyleClass)) L.DomUtil.addClass(this._container, this.options.activeStyleClass);
+        // Ensures that the 'active state' CSS is applied to the control if either the draw or delete modes are active
+        if (this._drawMode || this._deleteMode) this._container.setAttribute('data-reachability-active', 'true');
 
         // Accessibility: set the expanded state of the expand button to false
         this._toggleButton.setAttribute('aria-expanded', 'false');
@@ -511,8 +511,8 @@ L.Control.Reachability = L.Control.extend({
         // Accessibility: indicate that the delete button has been toggled off
         this._deleteControl.setAttribute('aria-pressed', 'false');
 
-        // If collapsed == true, remove the active class from the collapsed control
-        if (L.DomUtil.hasClass(this._container, this.options.activeStyleClass)) L.DomUtil.removeClass(this._container, this.options.activeStyleClass);
+        // Ensure the 'active state' CSS is removed from the control if it is collapsed
+        this._container.setAttribute('data-reachability-active', 'false');
 
         // Fire event to inform that the control delete mode has been deactivated
         this._map.fire('reachability:delete_deactivated');
