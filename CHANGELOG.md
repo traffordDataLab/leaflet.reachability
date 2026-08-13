@@ -1,5 +1,8 @@
 # leaflet.reachability Changelog
 
+## 2.0.2 (2026-08-13)
+Changed the deprecated API URL from **api.openrouteservice.org/v2/isochrones** to **api.heigit.org/openrouteservice/v2/isochrones** as [directed by openrouteservice](https://ask.openrouteservice.org/t/deprecating-api-openrouteservice-org-in-favour-of-api-heigit-org/7912).
+
 ## 2.0.1 (2020-11-27)
 Minor update to the attribution in accordance with the [OpenRouteService updated terms of service](https://openrouteservice.org/terms-of-service/).
 

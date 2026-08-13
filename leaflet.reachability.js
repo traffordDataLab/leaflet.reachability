@@ -1,6 +1,6 @@
 /*
     Created:        2018-06-12 by James Austin - Trafford Data Lab
-    Latest update:  2020-11-27
+    Latest update:  2026-08-13
     Purpose:        Uses openrouteservice API to create isolines showing areas within reach of certain travel times based on different modes of travel or distance. See https://wiki.openstreetmap.org/wiki/Isochrone for more information
     Dependencies:   Leaflet.js (external library), openrouteservice.org API (requires a key - free service available via registration)
     Licence:        https://github.com/traffordDataLab/leaflet.reachability/blob/master/LICENSE
@@ -112,7 +112,7 @@ L.Control.Reachability = L.Control.extend({
 
     onAdd: function (map) {
         // Initial settings
-        this.version = '2.0.1';
+        this.version = '2.0.2';
         this._map = map;
         this._collapsed = this.options.collapsed;
         this._drawMode = false;
@@ -697,7 +697,7 @@ L.Control.Reachability = L.Control.extend({
             // Setup the request object and associated items
             var request = new XMLHttpRequest();
 
-            request.open('POST', 'https://api.openrouteservice.org/v2/isochrones/' + this._travelMode);
+            request.open('POST', 'https://api.heigit.org/openrouteservice/v2/isochrones/' + this._travelMode);
 
             request.setRequestHeader('Content-Type', 'application/geo+json; charset=utf-8');
             request.setRequestHeader('Authorization', this.options.apiKey);

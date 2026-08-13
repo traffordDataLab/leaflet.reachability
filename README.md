@@ -1,19 +1,26 @@
 # leaflet.reachability
-[Trafford Data Lab](https://www.trafforddatalab.io) plugin for the [Leaflet](https://leafletjs.com) JavaScript library to show areas of reachability based on time or distance for different modes of travel using the [openrouteservice isochrones API](https://openrouteservice.org/dev/#/api-docs/v2/isochrones/{profile}/post).
+[Trafford Data Lab](https://www.trafforddatalab.io) plugin for pre-2.x.x versions of the [Leaflet](https://leafletjs.com) JavaScript library to show areas of reachability based on time or distance for different modes of travel using the [openrouteservice isochrones API](https://openrouteservice.org/dev/#/api-docs/v2/isochrones/{profile}/post).
 
 You can [view the demo](https://www.trafforddatalab.io/leaflet.reachability/leaflet.reachability_example.html) to get an idea of what it can do, or view a more customised implementation (which uses more of the available styling options) in our [Explore mapping application](https://www.trafforddatalab.io/explore/).
 
 We have published an [article](https://medium.com/@traffordDataLab/out-of-reach-introducing-our-distance-and-travel-time-plugin-859932cb12e5) explaining the benefits of using network buffers rather than euclidean distance when determining reachability as well as creating the following short videos demonstrating example uses for the plugin:
+
 - [How many facilities are within a 15 minute walk?](https://vimeo.com/291529944)
 - [Finding a common location within reach](https://vimeo.com/292728150)
 
-## Documentation (v2.0.1)
-You will need to obtain a free API key from [openrouteservice](https://openrouteservice.org/dev/#/signup) before using this plugin. Please do not use the key from the demo in your own applications. Consult the [changelog](CHANGELOG.md) to find out what has changed from previous versions.
+Please consult the [changelog](CHANGELOG.md) to find out what has changed from previous versions.
+
+## Documentation (v2.0.2)
+**PLEASE NOTE:**
+
+- Pre-2.0.2 versions of **this** library (leaflet.reachability) will no longer work from 24 August 2026 onwards. The [changelog](CHANGELOG.md) explains why. 
+- All **Leaflet** example code below relates to pre-2.x.x versions of **their** library.
+- You will need to obtain a free API key from [openrouteservice](https://openrouteservice.org/dev/#/signup) before using this plugin. Please do not use the key from the demo in your own applications.
 
 After including the CSS and JS in your page (NOTE - you can also use minified versions e.g. .min.js/.min.css if you prefer):...
 ```HTML
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/trafforddatalab/leaflet.reachability@v2.0.1/leaflet.reachability.css"/>
-<script src="https://cdn.jsdelivr.net/gh/trafforddatalab/leaflet.reachability@v2.0.1/leaflet.reachability.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/trafforddatalab/leaflet.reachability@v2.0.2/leaflet.reachability.css"/>
+<script src="https://cdn.jsdelivr.net/gh/trafforddatalab/leaflet.reachability@v2.0.2/leaflet.reachability.js"></script>
 ```
 
 ...you can then initialise the plugin in the standard Leaflet way adding it to a map instance:
@@ -250,11 +257,11 @@ These properties can be bound to a popup or displayed within a custom container 
 
 **Version**
 
-If the plugin was initialised with an object called `reachabilityControl`, you can obtain the version number using `reachabilityControl.version`. This will return a string in the [Semantic Versioning](https://semver.org/spec/v2.0.0.html) format `"MAJOR.MINOR.PATCH"` e.g. `"2.0.1"`.
+If the plugin was initialised with an object called `reachabilityControl`, you can obtain the version number using `reachabilityControl.version`. This will return a string in the [Semantic Versioning](https://semver.org/spec/v2.0.0.html) format `"MAJOR.MINOR.PATCH"` e.g. `"2.0.2"`.
 
 ### Examples
 
-The following code examples, in addition to the [demo page](https://rawgit.com/trafforddatalab/leaflet.reachability/master/leaflet.reachability_example.html), demonstrate the types of customisation possible using the options and events in the tables above. The plugin has been designed to follow the same coding style and methodology as shown in the [Leaflet tutorials](https://leafletjs.com/examples.html) and so should provide a familiar method of integrating and interacting with the plugin in your applications.
+The following code examples, in addition to the [demo page](https://www.trafforddatalab.io/leaflet.reachability/leaflet.reachability_example.html), demonstrate the types of customisation possible using the options and events in the tables above. The plugin has been designed to follow the same coding style and methodology as shown in the [Leaflet tutorials](https://leafletjs.com/examples.html) and so should provide a familiar method of integrating and interacting with the plugin in your applications.
 
 **Example 1: Changing the HTML content of the expand button to an icon**
 
